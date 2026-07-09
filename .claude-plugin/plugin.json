@@ -1,0 +1,14 @@
+{
+  "name": "groundwork",
+  "displayName": "Groundwork",
+  "description": "Opt-in, spec-driven development framework for Claude Code: Socratic discovery, PRDs, ADRs, tracer-bullet issues, TDD execution, and review. Nothing fires without a slash command.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Mauricio Vieira",
+    "email": "mauricio.vieira@gmail.com"
+  },
+  "homepage": "https://github.com/mauriciovieira/groundwork",
+  "repository": "https://github.com/mauriciovieira/groundwork",
+  "license": "MIT",
+  "keywords": ["spec-driven-development", "prd", "adr", "sdd", "workflow", "tdd"]
+}

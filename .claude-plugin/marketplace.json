@@ -1,0 +1,21 @@
+{
+  "name": "groundwork",
+  "owner": {
+    "name": "Mauricio Vieira",
+    "email": "mauricio.vieira@gmail.com"
+  },
+  "description": "Marketplace hosting the groundwork spec-driven-development plugin.",
+  "plugins": [
+    {
+      "name": "groundwork",
+      "source": "./",
+      "description": "Opt-in, spec-driven development framework for Claude Code: Socratic discovery, PRDs, ADRs, tracer-bullet issues, TDD execution, and review. Nothing fires without a slash command.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Mauricio Vieira"
+      },
+      "license": "MIT",
+      "keywords": ["spec-driven-development", "prd", "adr", "sdd", "workflow", "tdd"]
+    }
+  ]
+}

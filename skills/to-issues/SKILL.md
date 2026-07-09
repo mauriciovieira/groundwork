@@ -1,0 +1,60 @@
+---
+name: to-issues
+description: Break prd.md and adr/ (or a plan passed as argument) into tracer-bullet vertical slices, tag each HITL or AFK, build the dependency graph, and create them in the configured tracker.
+disable-model-invocation: true
+argument-hint: "[feature-slug]"
+---
+
+# groundwork:to-issues
+
+Turn a plan into independently-gradable work items: tracer-bullet vertical slices, dependency-ordered, created in whatever tracker this repo is configured for.
+
+## 0. Preconditions
+
+Read `docs/groundwork/config.json`. If it doesn't exist, tell the user to run `/groundwork:setup` first and stop.
+
+## 1. Gather the input
+
+By default, read `docs/groundwork/features/NNNN-slug/prd.md` and every file under its `adr/`. If the user passed a plan directly instead (as an argument or pasted into the conversation), use that. Either way, make sure you understand the acceptance criteria and any accepted architectural decisions before slicing - re-read anything unclear rather than guessing.
+
+## 2. Slice into tracer bullets
+
+A slice cuts **end-to-end through every layer it touches** - schema, API, UI, tests, whatever the feature actually spans. Never carve out a horizontal slice that's just "the database layer" or just "the UI" with nothing working behind it. Prefer many thin slices over a few thick ones: a slice that can't ship and be verified on its own is too big.
+
+Order doesn't matter yet at this stage - focus on getting the cuts right. Sequencing happens in the dependency graph below.
+
+## 3. Tag each slice
+
+For every slice, work out:
+
+- **Title**: short, specific, describes the end-to-end capability it adds.
+- **Type**: `HITL` (needs a human decision or review mid-flight - touches something irreversible, ambiguous, or outside what the PRD/ADRs already decided) or `AFK` (mergeable without a human in the loop, because the PRD and ADRs already say enough to build and verify it alone). **Prefer AFK.** Only mark `HITL` when there's a concrete reason a human has to be involved, not by default caution.
+- **Blocked-by**: which other slices must land first, if any.
+- **Covers**: which user stories or acceptance criteria from the PRD this slice satisfies.
+
+## 4. Present and quiz
+
+Show the user the full breakdown as a numbered list (Title, Type, Blocked-by, Covers) before creating anything. Then ask about granularity ("is any of these too big, too small, or wrong to cut here?") and about the dependency graph ("did I get the blocking order right?"). Iterate on the list until the user approves it - don't create issues from a list they haven't confirmed.
+
+## 5. Create the items
+
+Once approved, create the items in dependency order (blockers before what they block), in the tracker named by `config.json`'s `tracker` field. The slicing, tagging, and quiz above are identical regardless of destination - only this step differs:
+
+- **`github`**: create each with `gh issue create --title "..." --body "..."`, applying any `triage_labels` from config. Put Type, Blocked-by (as `Blocked by #<number>`, filled in once the blocking issue exists), and Covers in the issue body. Cross-reference by issue number.
+- **`linear`**: use the Linear MCP tools if connected (check via a tool search if unsure what's available); otherwise tell the user what's missing rather than guessing at an API call. Set the same fields; if the tracker doesn't support a native blocking relation through the tools available, put `Blocked by <identifier>` in the description instead.
+- **`local`**: append each slice to `docs/groundwork/features/NNNN-slug/tasks.md` as:
+
+  ```markdown
+  ## Slice NNNN: Title
+
+  - Type: AFK
+  - Blocked-by: none
+  - Covers: <acceptance criteria / user stories referenced>
+  - Status: open
+  ```
+
+  Number slices with a four-digit sequence scoped to that feature's `tasks.md`, starting at `0001`.
+
+## 6. Hand off
+
+Report what was created and where (issue numbers/links, or the `tasks.md` path). Suggest `/groundwork:build` to start executing the unblocked slices.
