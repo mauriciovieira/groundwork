@@ -1,6 +1,6 @@
 ---
 name: improve-codebase-architecture
-description: Find deepening opportunities in a codebase, informed by the domain language in docs/groundwork/glossary.md and the decisions in docs/adr/ (or the current feature's adr/). Use periodically, alongside the main brainstorm/grill/build flow, when the user wants to improve architecture, find refactoring opportunities, consolidate tightly-coupled modules, or make a codebase more testable and AI-navigable.
+description: Find deepening opportunities in a codebase, informed by the domain language in docs/groundwork/glossary.md and the decisions in docs/groundwork/adr/ (or the current feature's adr/). Use periodically, alongside the main brainstorm/grill/build flow, when the user wants to improve architecture, find refactoring opportunities, consolidate tightly-coupled modules, or make a codebase more testable and AI-navigable.
 disable-model-invocation: true
 ---
 
@@ -39,7 +39,7 @@ This skill is _informed_ by the project's domain model. `docs/groundwork/glossar
 
 ### 1. Explore
 
-Read `docs/groundwork/glossary.md` and any ADRs in the area you're touching first - check the repo-root `docs/adr/` for system-wide decisions, and the relevant feature's `docs/groundwork/features/NNNN-slug/adr/` if the area maps to work already in flight.
+Read `docs/groundwork/glossary.md` and any ADRs in the area you're touching first - check `docs/groundwork/adr/` for system-wide decisions not tied to one feature, and the relevant feature's `docs/groundwork/features/NNNN-slug/adr/` if the area maps to work already in flight.
 
 Then use the Agent tool with `subagent_type=Explore` to walk the codebase. Don't follow rigid heuristics - explore organically and note where you experience friction:
 
@@ -104,7 +104,7 @@ Side effects happen inline as decisions crystallize:
   What becomes easier or harder as a result.
   ```
 
-  If the candidate belongs to a feature already in flight, number it into that feature's `docs/groundwork/features/NNNN-slug/adr/`, scoped and sequenced the same way `grill` does. Otherwise - most deepening work isn't tied to a single feature - write it to a repo-root `docs/adr/MMMM-title.md`, sequenced independently. Either way, ADRs are **append-only** once `Accepted`: a change of mind is a new ADR that supersedes the old one, never an edit to a decided one.
+  If the candidate belongs to a feature already in flight, number it into that feature's `docs/groundwork/features/NNNN-slug/adr/`, scoped and sequenced the same way `grill` does. Otherwise - most deepening work isn't tied to a single feature - write it to `docs/groundwork/adr/MMMM-title.md` (create the directory lazily if it doesn't exist yet), sequenced independently of any feature. Either way, ADRs are **append-only** once `Accepted`: a change of mind is a new ADR that supersedes the old one, never an edit to a decided one.
 
 - **Want to explore alternative interfaces for the deepened module?** See [INTERFACE-DESIGN.md](INTERFACE-DESIGN.md).
 

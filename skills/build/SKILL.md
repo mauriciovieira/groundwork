@@ -7,7 +7,7 @@ argument-hint: "[feature-slug] [--worktree] [--parallel]"
 
 # groundwork:build
 
-Implement the slices `to-issues` created. The default path is deliberately simple: one slice at a time, in this conversation, using TDD. Worktrees and parallel sub-agents are opt-in flags, not defaults - reach for them when the user asks, not automatically.
+Implement the slices `to-issues` created - or, for issues `/groundwork:triage` marked `ready-for-agent`/`ready-for-human` with no PRD behind them, implement straight from their Agent Brief. The default path is deliberately simple: one slice at a time, in this conversation, using TDD. Worktrees and parallel sub-agents are opt-in flags, not defaults - reach for them when the user asks, not automatically.
 
 ## 0. Preconditions
 
@@ -23,11 +23,13 @@ Pull from the configured tracker:
 
 If nothing is unblocked, say so and stop - don't force a blocked slice through.
 
+An open issue is workable whether it came from `to-issues` (has a `Type: HITL`/`AFK` field pointing back to a `prd.md`) or from `/groundwork:triage` (has a `Type: HITL`/`AFK` field inside its own Agent Brief comment, with no PRD at all) - both carry the same `Type` field in the same place a build pass looks for it, so treat them identically from here on.
+
 ## 2. Default: sequential, one slice at a time
 
 For each unblocked slice, in order:
 
-1. Read the slice's acceptance criteria and the relevant PRD/ADR sections.
+1. Read the slice's acceptance criteria - from `prd.md` if it's a `to-issues` slice, or from its own Agent Brief comment if `/groundwork:triage` created it directly - and the relevant ADR sections.
 2. Use the `groundwork:tdd` technique to implement it: a failing test per acceptance criterion first, minimal code to pass, then refactor.
 3. Mark the slice done in the tracker (close the issue, or set `Status: done` in `tasks.md`) once its tests pass.
 4. Move to the next unblocked slice.

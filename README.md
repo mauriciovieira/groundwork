@@ -62,7 +62,7 @@ triage ─────────────┘
 ## PRD, ADR, issues - not spec and plan
 
 - **`prd.md`** is the what and why: problem, users, goals, non-goals, acceptance criteria, out-of-scope. One per feature, at `docs/groundwork/features/NNNN-slug/prd.md`.
-- **`adr/NNNN-title.md`** is one architectural or process decision per file, in Nygard format (Status, Context, Decision, Consequences). ADRs are append-only once `Accepted` - a change of mind is a *new* ADR that marks the old one `Superseded`, never an edit to a decided one.
+- **`adr/NNNN-title.md`** is one architectural or process decision per file, in Nygard format (Status, Context, Decision, Consequences). ADRs are append-only once `Accepted` - a change of mind is a *new* ADR that marks the old one `Superseded`, never an edit to a decided one. Most ADRs are feature-scoped (`docs/groundwork/features/NNNN-slug/adr/`), written by `grill` as a feature is designed. `improve-codebase-architecture` also writes ADRs for decisions that aren't tied to one feature, into a sibling `docs/groundwork/adr/`, sequenced independently.
 - **Issues** are tracer-bullet vertical slices - each cuts end-to-end through every layer it touches, never a horizontal slice of just one layer. `to-issues` tags each `HITL` (needs a human decision or review) or `AFK` (mergeable without one), preferring `AFK`, and builds the `blocked-by` graph before creating anything.
 
 ```
@@ -71,6 +71,8 @@ docs/groundwork/
   glossary.md
   STATE.md
   quicklog.md            # only if you've used /groundwork:quick with logging
+  adr/                   # system-wide decisions, not tied to one feature
+    0001-title.md        # written by improve-codebase-architecture; created lazily
   features/
     0001-example-slug/
       prd.md
