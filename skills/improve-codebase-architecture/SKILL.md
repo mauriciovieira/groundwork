@@ -1,6 +1,6 @@
 ---
 name: improve-codebase-architecture
-description: Find deepening opportunities in a codebase, informed by the domain language in docs/groundwork/glossary.md and the decisions in docs/groundwork/adr/ (or the current feature's adr/). Use periodically, alongside the main brainstorm/grill/build flow, when the user wants to improve architecture, find refactoring opportunities, consolidate tightly-coupled modules, or make a codebase more testable and AI-navigable.
+description: Find deepening opportunities in a codebase, informed by the domain language in docs/groundwork/glossary.md and the decisions in docs/groundwork/adr/ (or the current feature's adr/). Use periodically, alongside the main brainstorm/survey/build flow, when the user wants to improve architecture, find refactoring opportunities, consolidate tightly-coupled modules, or make a codebase more testable and AI-navigable.
 disable-model-invocation: true
 ---
 
@@ -76,17 +76,17 @@ See [HTML-REPORT.md](HTML-REPORT.md) for the full HTML scaffold, diagram pattern
 
 Do NOT propose interfaces yet. After the file is written, ask the user: "Which of these would you like to explore?"
 
-### 3. Grilling loop
+### 3. Interview loop
 
-Once the user picks a candidate, drop into a `groundwork:grilling` session. Walk the design tree with them - constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
+Once the user picks a candidate, drop into a `groundwork:interview-loop` session. Walk the design tree with them - constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
 
 Side effects happen inline as decisions crystallize:
 
-- **Naming a deepened module after a concept not in the glossary?** Add or update an entry in `docs/groundwork/glossary.md` - a term and the one thing a newcomer must know to use it correctly, same format `grill` uses.
+- **Naming a deepened module after a concept not in the glossary?** Add or update an entry in `docs/groundwork/glossary.md` - a term and the one thing a newcomer must know to use it correctly, same format `survey` uses.
 - **Sharpening a fuzzy term during the conversation?** Update `docs/groundwork/glossary.md` right there.
 - **User rejects the candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing - skip ephemeral reasons ("not worth it right now") and self-evident ones.
 
-  Write it in Nygard format, same as `grill`:
+  Write it in Nygard format, same as `survey`:
 
   ```markdown
   # MMMM. Title
@@ -104,7 +104,7 @@ Side effects happen inline as decisions crystallize:
   What becomes easier or harder as a result.
   ```
 
-  If the candidate belongs to a feature already in flight, number it into that feature's `docs/groundwork/features/NNNN-slug/adr/`, scoped and sequenced the same way `grill` does. Otherwise - most deepening work isn't tied to a single feature - write it to `docs/groundwork/adr/MMMM-title.md` (create the directory lazily if it doesn't exist yet), sequenced independently of any feature. Either way, ADRs are **append-only** once `Accepted`: a change of mind is a new ADR that supersedes the old one, never an edit to a decided one.
+  If the candidate belongs to a feature already in flight, number it into that feature's `docs/groundwork/features/NNNN-slug/adr/`, scoped and sequenced the same way `survey` does. Otherwise - most deepening work isn't tied to a single feature - write it to `docs/groundwork/adr/MMMM-title.md` (create the directory lazily if it doesn't exist yet), numbered with the same four-digit sequence rule as feature-scoped ADRs but scoped to this directory - starting at `0001`, next available after that - and sequenced independently of any feature. Either way, ADRs are **append-only** once `Accepted`: a change of mind is a new ADR that supersedes the old one, never an edit to a decided one.
 
 - **Want to explore alternative interfaces for the deepened module?** See [INTERFACE-DESIGN.md](INTERFACE-DESIGN.md).
 

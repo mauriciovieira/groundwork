@@ -72,9 +72,9 @@ Show counts and a one-line summary per issue. Let the maintainer pick.
 
 2. **Recommend.** Tell the maintainer your category and state recommendation with reasoning, plus a brief codebase summary relevant to the issue. Wait for direction.
 
-3. **Reproduce (bugs only).** Before any grilling, attempt reproduction: read the reporter's steps, trace the relevant code, run tests or commands. Report what happened - successful repro with code path, failed repro, or insufficient detail (a strong `needs-info` signal). A confirmed repro makes a much stronger agent brief.
+3. **Reproduce (bugs only).** Before any interview, attempt reproduction: read the reporter's steps, trace the relevant code, run tests or commands. Report what happened - successful repro with code path, failed repro, or insufficient detail (a strong `needs-info` signal). A confirmed repro makes a much stronger agent brief.
 
-4. **Grill (if needed).** If the issue needs fleshing out, use the `groundwork:grilling` technique - ask detailed, one-at-a-time questions until every branch of the issue is resolved.
+4. **Interview (if needed).** If the issue needs fleshing out, use the `groundwork:interview-loop` technique - ask detailed, one-at-a-time questions until every branch of the issue is resolved.
 
 5. **Apply the outcome:**
    - `ready-for-agent` - post an agent brief comment ([AGENT-BRIEF.md](AGENT-BRIEF.md)). Give it `**Type:** AFK` in the brief so `/groundwork:build` can pick it up directly, exactly like a `to-issues`-created slice.
@@ -86,7 +86,7 @@ Show counts and a one-line summary per issue. Let the maintainer pick.
 
 ## Quick state override
 
-If the maintainer says "move #42 to ready-for-agent", trust them and apply the role directly. Confirm what you're about to do (role changes, comment, close), then act. Skip grilling - but never skip the Agent Brief: `ready-for-agent`/`ready-for-human` are only reachable with one posted (see the outcome rules above), since `build` depends on its `Type` field to treat the issue as workable. Draft it from the issue's existing content; if something the template needs (acceptance criteria, current/desired behavior) is genuinely missing, ask the maintainer that one thing rather than reopening a full grilling session.
+If the maintainer says "move #42 to ready-for-agent", trust them and apply the role directly. Confirm what you're about to do (role changes, comment, close), then act. Skip the interview - but never skip the Agent Brief: `ready-for-agent`/`ready-for-human` are only reachable with one posted (see the outcome rules above), since `build` depends on its `Type` field to treat the issue as workable. Draft it from the issue's existing content; if something the template needs (acceptance criteria, current/desired behavior) is genuinely missing, ask the maintainer that one thing rather than reopening a full interview session.
 
 ## Needs-info template
 
@@ -106,7 +106,7 @@ If the maintainer says "move #42 to ready-for-agent", trust them and apply the r
 - question 2
 ```
 
-Capture everything resolved during grilling under "established so far" so the work isn't lost. Questions must be specific and actionable, not "please provide more info".
+Capture everything resolved during the interview under "established so far" so the work isn't lost. Questions must be specific and actionable, not "please provide more info".
 
 ## Resuming a previous session
 
@@ -114,4 +114,4 @@ If prior triage notes exist on the issue, read them, check whether the reporter 
 
 ## Relationship to `to-issues`
 
-`to-issues` slices a `prd.md` into tracer-bullet work; `triage` sorts issues that already exist and, for `ready-for-agent`/`ready-for-human` outcomes, makes them directly buildable without a PRD at all. If an issue turns out to need real design work during grilling, tell the maintainer it's grown past a quick triage and suggest `/groundwork:grill` or `/groundwork:to-prd` instead of forcing an agent brief onto something underspecified.
+`to-issues` slices a `prd.md` into tracer-bullet work; `triage` sorts issues that already exist and, for `ready-for-agent`/`ready-for-human` outcomes, makes them directly buildable without a PRD at all. If an issue turns out to need real design work during the interview, tell the maintainer it's grown past a quick triage and suggest `/groundwork:survey` or `/groundwork:to-prd` instead of forcing an agent brief onto something underspecified.

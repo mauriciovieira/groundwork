@@ -13,12 +13,25 @@ Configure groundwork for this repository, once. The output is `docs/groundwork/c
 Look for `docs/groundwork/config.json` (or the configured `docs_dir` if you already know it moved). If it exists:
 
 - Show the user the current settings.
-- Ask whether they want to reconfigure, and if so, which fields (tracker, docs location, triage labels, rules file). Do not re-run the full interview blind.
-- If they just want to confirm it's already set up, say so and stop.
+- If `project_type` is missing, or it's `"existing"` with `detected_stack` missing or empty, that's an incomplete or backfill-needed state either way - don't just confirm and stop. Tell the user what's missing, then run step 2 below to detect it and step 4 to write it back into the existing config, leaving every other field untouched. This backfill doesn't need the full reconfigure interview.
+- Otherwise, ask whether they want to reconfigure, and if so, which fields (tracker, docs location, triage labels, rules file). Do not re-run the full interview blind.
+- If they just want to confirm it's already set up and `project_type`/`detected_stack` are consistent, say so and stop.
 
 If it does not exist, continue.
 
-## 2. Ask, one topic at a time
+## 2. Detect implementation status
+
+Inspect the repository for signs of an existing implementation. Weigh signals by strength - a Dockerfile or CI config alone can exist in an otherwise-empty scaffold (this plugin's own repo has both), so don't let those count on their own:
+
+- **Strong signals** (any one of these is enough by itself): a package manifest (`package.json`, `pyproject.toml`, `go.mod`, `Gemfile`, `pom.xml`, etc.), a lockfile, or a real source directory with actual application code beyond scaffolding.
+- **Supporting signals only** (never sufficient alone, but corroborate a strong signal): a Dockerfile, CI config, framework-specific config files with no accompanying source.
+
+- **Existing implementation**: at least one strong signal is present. Record what you actually found - language, framework/runtime, package manager, notable infra config - as plain observed facts. Do not infer or invent anything not visible in the repo, and do not fill gaps with a best guess.
+- **Greenfield**: no strong signal (empty, docs-only, or just scaffolding - even if a Dockerfile or CI config exists, like this plugin's own repo). Record that plainly. No stack exists yet and none should be decided here - choosing one is `/groundwork:survey`'s job, once a feature is being interrogated, not `setup`'s.
+
+Show the user what was detected (or that nothing was found) and let them correct it before writing config. Either way, `setup` only records what's true today - it never makes or implies an architectural decision.
+
+## 3. Ask, one topic at a time
 
 Ask about each of these in turn. Do not batch them into a single wall-of-text question; this is a one-time setup, not a full survey, but each choice deserves its own moment.
 
@@ -37,9 +50,11 @@ Ask about each of these in turn. Do not batch them into a single wall-of-text qu
 - `claude` (default): groundwork writes `CLAUDE.md` at the repo root. Right choice for a Claude-only repo.
 - `agents`: for a multi-tool repo (Cursor, Codex, Copilot, etc. also read this repo). groundwork writes `AGENTS.md` as the portable source of truth, plus a thin `CLAUDE.md` whose body is `@AGENTS.md` and nothing else except any Claude-specific overrides. Never duplicate rule content across the two files - if a rule applies to every tool, it lives only in `AGENTS.md`.
 
-## 3. Write the config
+## 4. Write the config
 
-Create the docs directory and write `docs/groundwork/config.json`:
+If `docs/groundwork/config.json` doesn't exist yet, create the docs directory and write it fresh with every field below. If it already exists (a reconfigure, or the backfill from step 1), **update it in place**: merge only the fields that changed - the ones the user just answered, or `project_type`/`detected_stack` on a backfill - and leave every other existing field exactly as it was. Never regenerate the whole file from this template over an existing config; that's how a backfill run would silently clobber someone's `tracker`, `docs_dir`, `triage_labels`, or `rules_file`.
+
+Full shape of the file:
 
 ```json
 {
@@ -48,13 +63,22 @@ Create the docs directory and write `docs/groundwork/config.json`:
   "docs_dir": "docs/groundwork",
   "triage_labels": [],
   "triage_role_labels": {},
-  "rules_file": "claude"
+  "rules_file": "claude",
+  "project_type": "existing",
+  "detected_stack": {
+    "language": "...",
+    "framework": "...",
+    "package_manager": "...",
+    "notes": "..."
+  }
 }
 ```
 
 Adjust fields to what was chosen. For `tracker: "github"`, you may add a `"github": {"repo": "owner/name"}` block detected from the remote. For `tracker: "linear"`, add `"linear": {"team": "..."}` if the user gave one. `triage_role_labels` only needs entries for roles whose label differs from its own name - leave it `{}` if none do. Never write secrets into this file.
 
-## 4. Seed the docs
+Set `project_type` to `"existing"` or `"greenfield"` per step 2. Only include `detected_stack` for `"existing"` - populate it with what was actually found, nothing invented. For `"greenfield"`, omit `detected_stack` entirely (or leave it `null`); the stack gets decided later, in `/groundwork:survey`, and recorded as ADRs, not here.
+
+## 5. Seed the docs
 
 If they don't already exist, create:
 - `docs/groundwork/glossary.md` from `${CLAUDE_SKILL_DIR}/templates/glossary.md`
@@ -62,12 +86,12 @@ If they don't already exist, create:
 
 Leave both mostly empty; other skills fill them in as work happens. Do not translate or rewrite the template headers - later skills add content in whatever language the conversation is in, not a language baked in here.
 
-## 5. Write the rules file
+## 6. Write the rules file
 
 - `rules_file: "claude"`: if `CLAUDE.md` already exists at the repo root, leave its content alone and just confirm it's there. If it doesn't exist, create a minimal one that documents that this repo uses groundwork and points at `docs/groundwork/`.
 - `rules_file: "agents"`: create `AGENTS.md` at the repo root if it doesn't exist (minimal, same content as above). Create or update `CLAUDE.md` so its body is exactly `@AGENTS.md` plus, only if needed, a short "Claude-specific" section below it. If `CLAUDE.md` already has unrelated content, ask before overwriting it rather than clobbering the user's existing rules.
 
-## 6. Confirm and hand off
+## 7. Confirm and hand off
 
 Tell the user what was created. Suggest a next step based on where they are:
 - Have an idea but no plan yet -> `/groundwork:brainstorm`
