@@ -13,6 +13,8 @@ Move issues on the configured issue tracker through a small state machine of tri
 
 Read `docs/groundwork/config.json`. If it doesn't exist, tell the user to run `/groundwork:setup` first and stop.
 
+This skill assumes an external tracker with real issues, labels, comments, and reporters (`tracker: "github"` or `"linear"`). If `config.json`'s `tracker` is `"local"`, tell the user triage doesn't apply - `local` mode has no inbound-issue concept to sort, only `docs/groundwork/features/NNNN-slug/tasks.md` entries that `to-issues` already created with a type and status - and stop.
+
 Every comment or issue posted to the issue tracker during triage **must** start with this disclaimer:
 
 ```

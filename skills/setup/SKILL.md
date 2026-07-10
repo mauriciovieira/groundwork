@@ -31,7 +31,7 @@ Ask about each of these in turn. Do not batch them into a single wall-of-text qu
 
 **Triage labels.** Optional. Only meaningful for `github`/`linear`. A short list of labels `to-issues` applies to every issue it creates (e.g. `needs-triage`). Skip for `local`.
 
-**Triage role labels.** Optional, and a separate thing from the list above - only ask if the user says they'll use `/groundwork:triage`. `triage` moves an issue through five canonical roles (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`) and needs to know the actual label string for each one. Default: each role's label equals its name. Ask if any should map to a different existing label in this repo's tracker (e.g. role `needs-triage` -> label `bug:triage`); only record the ones that differ.
+**Triage role labels.** Optional, and a separate thing from the list above - only ask if the user says they'll use `/groundwork:triage`, and only meaningful for `github`/`linear` (skip for `local`, same as the config above). `triage` moves an issue through five canonical *state* roles (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`) and needs to know the actual label string for each one - `triage_role_labels` covers only these five; the `bug`/`enhancement` *category* roles are fixed and not configurable here. Default: each state role's label equals its name. Ask if any should map to a different existing label in this repo's tracker (e.g. role `needs-triage` -> label `bug:triage`); only record the ones that differ.
 
 **Rules file.** Where repo-level rules live:
 - `claude` (default): groundwork writes `CLAUDE.md` at the repo root. Right choice for a Claude-only repo.

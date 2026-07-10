@@ -23,7 +23,7 @@ Pull from the configured tracker:
 
 If nothing is unblocked, say so and stop - don't force a blocked slice through.
 
-An open issue is workable whether it came from `to-issues` (has a `Type: HITL`/`AFK` field pointing back to a `prd.md`) or from `/groundwork:triage` (has a `Type: HITL`/`AFK` field inside its own Agent Brief comment, with no PRD at all) - both carry the same `Type` field in the same place a build pass looks for it, so treat them identically from here on.
+An open issue is workable whether it came from `to-issues` (a `- Type: AFK`/`HITL` line in the issue body, pointing back to a `prd.md`) or from `/groundwork:triage` (a `**Type:** AFK`/`HITL` line inside its own Agent Brief comment, with no PRD at all) - the format differs, but both carry a `Type` field somewhere in the issue, so look for it in whichever place applies and treat the two sources identically from here on.
 
 ## 2. Default: sequential, one slice at a time
 
