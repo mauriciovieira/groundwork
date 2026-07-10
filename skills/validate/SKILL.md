@@ -23,7 +23,7 @@ Read the slices from the configured tracker (open/closed issues, or `tasks.md` s
 
 ## 3. Check ADR compliance
 
-For every `Accepted` ADR under the feature's `adr/`, do a best-effort check that the current code doesn't contradict its Decision. This can't be exhaustive - look for obvious violations (an ADR mandates one approach and the code visibly does something else), not subtle ones. Say plainly when you can't verify something rather than asserting compliance you didn't check.
+For every `Accepted` ADR under the feature's `adr/`, and any relevant `Accepted` ADR under the system-wide `docs/groundwork/adr/` (written by `improve-codebase-architecture`), do a best-effort check that the current code doesn't contradict its Decision. This can't be exhaustive - look for obvious violations (an ADR mandates one approach and the code visibly does something else), not subtle ones. Say plainly when you can't verify something rather than asserting compliance you didn't check.
 
 ## 4. Report
 

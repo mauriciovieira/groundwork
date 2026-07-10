@@ -7,7 +7,7 @@ argument-hint: "[feature-slug] [--worktree] [--parallel]"
 
 # groundwork:build
 
-Implement the slices `to-issues` created. The default path is deliberately simple: one slice at a time, in this conversation, using TDD. Worktrees and parallel sub-agents are opt-in flags, not defaults - reach for them when the user asks, not automatically.
+Implement the slices `to-issues` created - or, for issues `/groundwork:triage` marked `ready-for-agent`/`ready-for-human` with no PRD behind them, implement straight from their Agent Brief. The default path is deliberately simple: one slice at a time, in this conversation, using TDD. Worktrees and parallel sub-agents are opt-in flags, not defaults - reach for them when the user asks, not automatically.
 
 ## 0. Preconditions
 
@@ -21,13 +21,17 @@ Pull from the configured tracker:
 - `linear`: query via the Linear MCP tools for open issues in this feature whose blockers are resolved.
 - `local`: parse `docs/groundwork/features/NNNN-slug/tasks.md` for slices with `Status: open` whose `Blocked-by` slices are already `Status: done`.
 
+If this repo also uses `/groundwork:triage`, the tracker will contain raw inbound issues too - ones still sitting in `needs-triage`, `needs-info`, or otherwise not yet through the triage state machine, and possibly carrying an unrelated "Type:" field of their own (many issue templates have one, e.g. "Type: bug"). Skip anything whose `Type` field isn't exactly `AFK` or `HITL` (in whichever format applies, see below) - that's the actual signal a slice or Agent Brief exists, not just the presence of some field named `Type`. Don't attempt to build it.
+
 If nothing is unblocked, say so and stop - don't force a blocked slice through.
+
+An open issue is workable whether it came from `to-issues` (a `Type` field valued `AFK`/`HITL` somewhere in the issue body, pointing back to a `prd.md`) or from `/groundwork:triage` (a `**Type:** AFK`/`HITL` line inside its own Agent Brief comment, with no PRD at all) - the exact markdown shape and location of that `Type` field isn't guaranteed to match between the two, so look for a `Type` field whose value is `AFK` or `HITL` (not just those words appearing anywhere), wherever in the issue it's written, and treat the two sources identically once found.
 
 ## 2. Default: sequential, one slice at a time
 
 For each unblocked slice, in order:
 
-1. Read the slice's acceptance criteria and the relevant PRD/ADR sections.
+1. Read the slice's acceptance criteria - from `prd.md` if it's a `to-issues` slice, or from its own Agent Brief comment if `/groundwork:triage` created it directly - and the relevant ADR sections.
 2. Use the `groundwork:tdd` technique to implement it: a failing test per acceptance criterion first, minimal code to pass, then refactor.
 3. Mark the slice done in the tracker (close the issue, or set `Status: done` in `tasks.md`) once its tests pass.
 4. Move to the next unblocked slice.
