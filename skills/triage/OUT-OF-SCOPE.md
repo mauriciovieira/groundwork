@@ -89,7 +89,7 @@ Only when an **enhancement** (not a bug) is rejected as `wontfix`. The flow:
 2. Check if a matching `.out-of-scope/` file already exists
 3. If yes: append the new issue to the "Prior requests" list
 4. If no: create a new file with the concept name, decision, reason, and first prior request
-5. Post a comment on the issue explaining the decision and mentioning the `.out-of-scope/` file
+5. Post a comment on the issue explaining the decision and mentioning the `.out-of-scope/` file - like every triage comment, it must start with the AI disclaimer (see `SKILL.md`)
 6. Close the issue with the `wontfix` role's label (its `triage_role_labels` mapping if configured, otherwise `wontfix` itself)
 
 ## Updating or removing out-of-scope files

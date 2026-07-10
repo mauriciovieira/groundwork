@@ -122,8 +122,8 @@ and append "..." to indicate truncation.
 **Summary:** Add `.out-of-scope/` directory support for tracking rejected feature requests
 
 **Current behavior:**
-When a feature request is rejected, the issue is closed with a `wontfix` label
-and a comment. There is no persistent record of the decision or reasoning.
+When a feature request is rejected, the issue is closed with the `wontfix`
+role's label and a comment. There is no persistent record of the decision or reasoning.
 Future similar requests require the maintainer to recall or search for the
 prior discussion.
 
