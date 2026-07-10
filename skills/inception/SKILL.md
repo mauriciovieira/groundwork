@@ -12,6 +12,8 @@ A single focused pass for a greenfield idea, not a multi-day workshop. By the en
 
 Read `docs/groundwork/config.json`. If it doesn't exist, tell the user to run `/groundwork:setup` first and stop.
 
+This skill stays in product discovery: vision, personas, scope, goals, non-goals, MVP sequencing. It does not require or produce a stack decision, and it must not invent one. Capture technical constraints only when the user states them as an actual product requirement (e.g. "must work offline", "must integrate with our existing SSO"), in the relevant `prd.md` section - choosing an application framework, database, or deployment target is out of scope here. That happens later, in `/groundwork:survey`, and is recorded as ADRs before `/groundwork:to-issues` will proceed.
+
 ## 1. Vision
 
 Get to a one-paragraph vision statement with the user: for whom, what need, what it is, how it's different from doing nothing (or from the obvious alternative). Don't accept a vague vision - if the user's first answer is generic, push once for specifics before moving on.

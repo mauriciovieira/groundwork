@@ -52,10 +52,19 @@ Don't batch this to the end. As soon as a decision resolves:
 
 Write everything in the language the conversation has been in. No em dashes in any generated document.
 
-## 4. Stop condition
+## 4. Implementation-readiness check
 
-Stop when the design survives the interview, per the `interview-loop` discipline's stop condition. Summarize what changed: which PRD sections were touched, which ADRs were created, which glossary terms were added.
+Before this feature can be declared ready for `/groundwork:to-issues`, confirm the implementation stack is actually settled - not just the product decisions above:
 
-## 5. Hand off
+- Read `project_type` from `docs/groundwork/config.json`. If it's `"existing"`, the `detected_stack` that `/groundwork:setup` recorded already answers this for anything the feature doesn't clearly push outside it. If the feature does need something the existing stack doesn't have (a new external service, a new datastore, etc.), interrogate that gap like any other decision and write the resulting ADR.
+- If `project_type` is `"greenfield"`, confirm one or more **accepted** ADRs (under this feature's `adr/`, or a shared project-wide `adr/` if that's how this repo organizes stack choices) explicitly cover, at minimum: application framework/runtime, frontend approach (if the feature has one), persistence/backend, authentication, deployment assumptions that affect implementation, and whether background processing or a message bus is required. Anything on that list still open is an unresolved branch of the interview, same as any other - interrogate it and write the ADR before moving on, don't wave it through.
 
-Once the plan is sharp, suggest `/groundwork:to-issues` to break it into work. If the user wants to keep refining later, mention `/groundwork:handoff` to save state before stopping.
+This is a hard stop condition: do not reach the hand-off step below with a greenfield stack still undecided, and never pick a stack yourself to close the gap - that decision belongs to the interview, made with the user.
+
+## 5. Stop condition
+
+Stop when the design survives the interview, per the `interview-loop` discipline's stop condition, and the implementation-readiness check above is satisfied. Summarize what changed: which PRD sections were touched, which ADRs were created, which glossary terms were added.
+
+## 6. Hand off
+
+Once the plan is sharp and implementation-ready, suggest `/groundwork:to-issues` to break it into work. If the user wants to keep refining later, mention `/groundwork:handoff` to save state before stopping. If the readiness check above is still unsatisfied, say so plainly instead of suggesting `to-issues`.

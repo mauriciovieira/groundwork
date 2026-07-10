@@ -18,7 +18,16 @@ Look for `docs/groundwork/config.json` (or the configured `docs_dir` if you alre
 
 If it does not exist, continue.
 
-## 2. Ask, one topic at a time
+## 2. Detect implementation status
+
+Inspect the repository for signs of an existing implementation: package manifests (`package.json`, `pyproject.toml`, `go.mod`, `Gemfile`, `pom.xml`, etc.), lockfiles, source directories beyond scaffolding, a Dockerfile, CI config, framework-specific files.
+
+- **Existing implementation**: one or more of those signals are present. Record what you actually found - language, framework/runtime, package manager, notable infra config - as plain observed facts. Do not infer or invent anything not visible in the repo, and do not fill gaps with a best guess.
+- **Greenfield**: no such signals (empty, docs-only, or just scaffolding like this plugin's own repo). Record that plainly. No stack exists yet and none should be decided here - choosing one is `/groundwork:survey`'s job, once a feature is being interrogated, not `setup`'s.
+
+Show the user what was detected (or that nothing was found) and let them correct it before writing config. Either way, `setup` only records what's true today - it never makes or implies an architectural decision.
+
+## 3. Ask, one topic at a time
 
 Ask about each of these in turn. Do not batch them into a single wall-of-text question; this is a one-time setup, not a full survey, but each choice deserves its own moment.
 
@@ -37,7 +46,7 @@ Ask about each of these in turn. Do not batch them into a single wall-of-text qu
 - `claude` (default): groundwork writes `CLAUDE.md` at the repo root. Right choice for a Claude-only repo.
 - `agents`: for a multi-tool repo (Cursor, Codex, Copilot, etc. also read this repo). groundwork writes `AGENTS.md` as the portable source of truth, plus a thin `CLAUDE.md` whose body is `@AGENTS.md` and nothing else except any Claude-specific overrides. Never duplicate rule content across the two files - if a rule applies to every tool, it lives only in `AGENTS.md`.
 
-## 3. Write the config
+## 4. Write the config
 
 Create the docs directory and write `docs/groundwork/config.json`:
 
@@ -48,13 +57,22 @@ Create the docs directory and write `docs/groundwork/config.json`:
   "docs_dir": "docs/groundwork",
   "triage_labels": [],
   "triage_role_labels": {},
-  "rules_file": "claude"
+  "rules_file": "claude",
+  "project_type": "existing",
+  "detected_stack": {
+    "language": "...",
+    "framework": "...",
+    "package_manager": "...",
+    "notes": "..."
+  }
 }
 ```
 
 Adjust fields to what was chosen. For `tracker: "github"`, you may add a `"github": {"repo": "owner/name"}` block detected from the remote. For `tracker: "linear"`, add `"linear": {"team": "..."}` if the user gave one. `triage_role_labels` only needs entries for roles whose label differs from its own name - leave it `{}` if none do. Never write secrets into this file.
 
-## 4. Seed the docs
+Set `project_type` to `"existing"` or `"greenfield"` per step 2. Only include `detected_stack` for `"existing"` - populate it with what was actually found, nothing invented. For `"greenfield"`, omit `detected_stack` entirely (or leave it `null`); the stack gets decided later, in `/groundwork:survey`, and recorded as ADRs, not here.
+
+## 5. Seed the docs
 
 If they don't already exist, create:
 - `docs/groundwork/glossary.md` from `${CLAUDE_SKILL_DIR}/templates/glossary.md`
@@ -62,12 +80,12 @@ If they don't already exist, create:
 
 Leave both mostly empty; other skills fill them in as work happens. Do not translate or rewrite the template headers - later skills add content in whatever language the conversation is in, not a language baked in here.
 
-## 5. Write the rules file
+## 6. Write the rules file
 
 - `rules_file: "claude"`: if `CLAUDE.md` already exists at the repo root, leave its content alone and just confirm it's there. If it doesn't exist, create a minimal one that documents that this repo uses groundwork and points at `docs/groundwork/`.
 - `rules_file: "agents"`: create `AGENTS.md` at the repo root if it doesn't exist (minimal, same content as above). Create or update `CLAUDE.md` so its body is exactly `@AGENTS.md` plus, only if needed, a short "Claude-specific" section below it. If `CLAUDE.md` already has unrelated content, ask before overwriting it rather than clobbering the user's existing rules.
 
-## 6. Confirm and hand off
+## 7. Confirm and hand off
 
 Tell the user what was created. Suggest a next step based on where they are:
 - Have an idea but no plan yet -> `/groundwork:brainstorm`
