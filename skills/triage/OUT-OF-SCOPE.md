@@ -90,7 +90,7 @@ Only when an **enhancement** (not a bug) is rejected as `wontfix`. The flow:
 3. If yes: append the new issue to the "Prior requests" list
 4. If no: create a new file with the concept name, decision, reason, and first prior request
 5. Post a comment on the issue explaining the decision and mentioning the `.out-of-scope/` file
-6. Close the issue with the `wontfix` label
+6. Close the issue with the `wontfix` role's label (its `triage_role_labels` mapping if configured, otherwise `wontfix` itself)
 
 ## Updating or removing out-of-scope files
 
