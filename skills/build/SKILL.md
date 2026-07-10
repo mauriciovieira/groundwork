@@ -25,7 +25,7 @@ If this repo also uses `/groundwork:triage`, the tracker will contain raw inboun
 
 If nothing is unblocked, say so and stop - don't force a blocked slice through.
 
-An open issue is workable whether it came from `to-issues` (a `Type` field valued `AFK`/`HITL` somewhere in the issue body, pointing back to a `prd.md`) or from `/groundwork:triage` (a `**Type:** AFK`/`HITL` line inside its own Agent Brief comment, with no PRD at all) - the exact formatting isn't guaranteed to match between the two, so look for that specific value wherever it appears rather than a specific markdown shape, and treat the two sources identically once found.
+An open issue is workable whether it came from `to-issues` (a `Type` field valued `AFK`/`HITL` somewhere in the issue body, pointing back to a `prd.md`) or from `/groundwork:triage` (a `**Type:** AFK`/`HITL` line inside its own Agent Brief comment, with no PRD at all) - the exact markdown shape and location of that `Type` field isn't guaranteed to match between the two, so look for a `Type` field whose value is `AFK` or `HITL` (not just those words appearing anywhere), wherever in the issue it's written, and treat the two sources identically once found.
 
 ## 2. Default: sequential, one slice at a time
 
