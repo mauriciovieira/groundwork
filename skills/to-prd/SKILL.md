@@ -1,6 +1,6 @@
 ---
 name: to-prd
-description: Synthesize the current conversation into prd.md - no interview, just capture what was already discussed. Use when the user has already talked through a plan and doesn't need survey.
+description: Synthesize the current conversation into prd.md - no interview, just capture what was already discussed. Use when the user has already talked through a plan and doesn't need a survey.
 disable-model-invocation: true
 argument-hint: "[feature-slug]"
 ---
