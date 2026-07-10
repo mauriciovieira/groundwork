@@ -27,9 +27,9 @@ This keeps the whole system opt-in from where you sit: nothing groundwork-relate
 | Command | What it does |
 | --- | --- |
 | `/groundwork:setup` | One-time config: issue tracker, docs location, triage labels, rules file. Run this first. |
-| `/groundwork:brainstorm` | Socratic discovery for a fuzzy idea, one question at a time. Hands off to `inception` or `grill`. |
+| `/groundwork:brainstorm` | Socratic discovery for a fuzzy idea, one question at a time. Hands off to `inception` or `survey`. |
 | `/groundwork:inception` | Lean Inception, lite: vision, personas, an is/is-not table, an MVP sequence. Writes the first `prd.md`. |
-| `/groundwork:grill` | The relentless interview: sharpens a plan, writing `prd.md`, `adr/` entries, and `glossary.md` as decisions land. |
+| `/groundwork:survey` | A rigorous design survey: sharpens a plan through a one-question-at-a-time interview, writing `prd.md`, `adr/` entries, and `glossary.md` as decisions land. |
 | `/groundwork:to-prd` | Synthesizes the current conversation into `prd.md`, no interview - use when you've already talked it through. |
 | `/groundwork:to-issues` | Breaks `prd.md` + `adr/` into tracer-bullet vertical slices (HITL/AFK, dependency-ordered) and creates them in your tracker. |
 | `/groundwork:build` | Implements the open, unblocked slices with TDD. Sequential by default; `--worktree` and `--parallel` are opt-in. |
@@ -38,13 +38,13 @@ This keeps the whole system opt-in from where you sit: nothing groundwork-relate
 | `/groundwork:handoff` | Reads or writes `docs/groundwork/STATE.md` to pause and resume work. |
 | `/groundwork:quick` | The escape hatch: does a trivial task directly, no PRD/ADR/issues. |
 
-Three more skills back the orchestrators above but have no slash command of their own, since they're only ever reached from inside one: `grilling` (the interview loop behind `grill`), `tdd` (the red-green-refactor loop behind `build`), and `worktree` (isolated branch-per-slice behind `build --worktree`).
+Three more skills back the orchestrators above but have no slash command of their own, since they're only ever reached from inside one: `interview-loop` (the interview loop behind `survey`), `tdd` (the red-green-refactor loop behind `build`), and `worktree` (isolated branch-per-slice behind `build --worktree`).
 
 ## The flow
 
 ```
 brainstorm ──┬──> inception ──┐
-             └──> grill <─────┴──> to-prd
+             └──> survey <────┴──> to-prd
                     │
                     v
                 to-issues ──> build ──> validate ──> code-review

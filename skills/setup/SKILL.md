@@ -20,7 +20,7 @@ If it does not exist, continue.
 
 ## 2. Ask, one topic at a time
 
-Ask about each of these in turn. Do not batch them into a single wall-of-text question; this is a one-time setup, not a full grill, but each choice deserves its own moment.
+Ask about each of these in turn. Do not batch them into a single wall-of-text question; this is a one-time setup, not a full survey, but each choice deserves its own moment.
 
 **Issue tracker.** Where should `to-issues` create work items?
 - `github`: uses `gh issue create`. Check `gh auth status` and that the current directory is inside a repo with a GitHub remote; tell the user plainly if either check fails, rather than silently falling back.

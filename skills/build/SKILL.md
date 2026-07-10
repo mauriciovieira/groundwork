@@ -46,7 +46,7 @@ After the parallel dispatch returns, review each agent's summary before marking 
 
 ## 5. When reality forces a deviation
 
-If implementing a slice reveals that the PRD or an accepted ADR is wrong, incomplete, or contradicted by what you're finding, **stop and log it rather than silently diverging**. Tell the user exactly what conflicts and why, and wait for a decision (update the PRD/ADR via `/groundwork:grill`, or explicitly accept the deviation) before continuing that slice. Never quietly implement something different from what the PRD or an accepted ADR says.
+If implementing a slice reveals that the PRD or an accepted ADR is wrong, incomplete, or contradicted by what you're finding, **stop and log it rather than silently diverging**. Tell the user exactly what conflicts and why, and wait for a decision (update the PRD/ADR via `/groundwork:survey`, or explicitly accept the deviation) before continuing that slice. Never quietly implement something different from what the PRD or an accepted ADR says.
 
 ## 6. Hand off
 
