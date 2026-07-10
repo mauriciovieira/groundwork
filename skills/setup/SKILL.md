@@ -13,9 +13,9 @@ Configure groundwork for this repository, once. The output is `docs/groundwork/c
 Look for `docs/groundwork/config.json` (or the configured `docs_dir` if you already know it moved). If it exists:
 
 - Show the user the current settings.
-- If `project_type` is missing (a config written before this field existed), don't just confirm and stop - tell the user it's missing, then run step 2 below to detect it and step 4 to write it back into the existing config, leaving every other field untouched. This backfill doesn't need the full reconfigure interview.
+- If `project_type` is missing, or it's `"existing"` with `detected_stack` missing or empty, that's an incomplete or backfill-needed state either way - don't just confirm and stop. Tell the user what's missing, then run step 2 below to detect it and step 4 to write it back into the existing config, leaving every other field untouched. This backfill doesn't need the full reconfigure interview.
 - Otherwise, ask whether they want to reconfigure, and if so, which fields (tracker, docs location, triage labels, rules file). Do not re-run the full interview blind.
-- If they just want to confirm it's already set up and `project_type` is present, say so and stop.
+- If they just want to confirm it's already set up and `project_type`/`detected_stack` are consistent, say so and stop.
 
 If it does not exist, continue.
 
