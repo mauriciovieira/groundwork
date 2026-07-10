@@ -1,6 +1,6 @@
 # groundwork
 
-A lightweight, opt-in, spec-driven development framework for Claude Code. It turns "let's build X" into a PRD, sharpened by an interview, broken into small vertical slices, built with TDD, and reviewed against both the code standards and the spec that motivated it - as much or as little of that as you actually invoke.
+A lightweight, opt-in, spec-driven development framework for Claude Code. It turns "let's build X" into a PRD (Product Requirements Document), sharpened by an interview, broken into small vertical slices, built with TDD (Test-Driven Development), and reviewed against both the code standards and the spec that motivated it - as much or as little of that as you actually invoke.
 
 groundwork never starts on its own. Every part of it is a skill you invoke explicitly with a `/groundwork:...` command; none of it auto-fires from a plain request, and an orchestrator never chains into another orchestrator without you typing the next command yourself. If you never type `/groundwork:anything`, groundwork has no effect on your session.
 
@@ -34,7 +34,7 @@ This keeps the whole system opt-in from where you sit: nothing groundwork-relate
 | `/groundwork:triage` | Sorts inbound issues (needs-triage/needs-info/ready-for-agent/ready-for-human/wontfix) before they reach `to-issues`, or straight into an agent brief when no PRD is needed. |
 | `/groundwork:to-issues` | Breaks `prd.md` + `adr/` into tracer-bullet vertical slices (HITL/AFK, dependency-ordered) and creates them in your tracker. |
 | `/groundwork:build` | Implements the open, unblocked slices with TDD. Sequential by default; `--worktree` and `--parallel` are opt-in. |
-| `/groundwork:validate` | Definition-of-Done gate: every acceptance criterion tested, every slice done or deferred, no ADR violated. |
+| `/groundwork:validate` | Definition-of-Done gate: every acceptance criterion tested, every slice done or deferred, no ADR (Architecture Decision Record) violated. |
 | `/groundwork:code-review` | Reviews the diff along a Standards axis and a Spec axis, in parallel, then merges both reports. |
 | `/groundwork:handoff` | Reads or writes `docs/groundwork/STATE.md` to pause and resume work. |
 | `/groundwork:quick` | The escape hatch: does a trivial task directly, no PRD/ADR/issues. |
