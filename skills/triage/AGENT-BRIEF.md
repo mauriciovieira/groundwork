@@ -134,9 +134,11 @@ requested the feature. When triaging new issues, these files should be
 checked for matches.
 
 **Key interfaces:**
-- Markdown file format in `.out-of-scope/` - each file should have a
-  `# Concept Name` heading, a `**Decision:**` line, a `**Reason:**` line,
-  and a `**Prior requests:**` list with issue links
+- Markdown file format in `.out-of-scope/` - relaxed design-doc style, not a
+  rigid template: a `# Concept Name` heading, a `## Why this is out of scope`
+  section in prose (paragraphs, code samples, examples), and a
+  `## Prior requests` section with a bulleted issue-link list (see
+  OUT-OF-SCOPE.md for the exact format)
 - The triage workflow should read all `.out-of-scope/*.md` files early
   and match incoming issues against them by concept similarity
 
