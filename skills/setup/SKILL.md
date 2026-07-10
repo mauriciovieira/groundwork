@@ -21,10 +21,13 @@ If it does not exist, continue.
 
 ## 2. Detect implementation status
 
-Inspect the repository for signs of an existing implementation: package manifests (`package.json`, `pyproject.toml`, `go.mod`, `Gemfile`, `pom.xml`, etc.), lockfiles, source directories beyond scaffolding, a Dockerfile, CI config, framework-specific files.
+Inspect the repository for signs of an existing implementation. Weigh signals by strength - a Dockerfile or CI config alone can exist in an otherwise-empty scaffold (this plugin's own repo has both), so don't let those count on their own:
 
-- **Existing implementation**: one or more of those signals are present. Record what you actually found - language, framework/runtime, package manager, notable infra config - as plain observed facts. Do not infer or invent anything not visible in the repo, and do not fill gaps with a best guess.
-- **Greenfield**: no such signals (empty, docs-only, or just scaffolding like this plugin's own repo). Record that plainly. No stack exists yet and none should be decided here - choosing one is `/groundwork:survey`'s job, once a feature is being interrogated, not `setup`'s.
+- **Strong signals** (any one of these is enough by itself): a package manifest (`package.json`, `pyproject.toml`, `go.mod`, `Gemfile`, `pom.xml`, etc.), a lockfile, or a real source directory with actual application code beyond scaffolding.
+- **Supporting signals only** (never sufficient alone, but corroborate a strong signal): a Dockerfile, CI config, framework-specific config files with no accompanying source.
+
+- **Existing implementation**: at least one strong signal is present. Record what you actually found - language, framework/runtime, package manager, notable infra config - as plain observed facts. Do not infer or invent anything not visible in the repo, and do not fill gaps with a best guess.
+- **Greenfield**: no strong signal (empty, docs-only, or just scaffolding - even if a Dockerfile or CI config exists, like this plugin's own repo). Record that plainly. No stack exists yet and none should be decided here - choosing one is `/groundwork:survey`'s job, once a feature is being interrogated, not `setup`'s.
 
 Show the user what was detected (or that nothing was found) and let them correct it before writing config. Either way, `setup` only records what's true today - it never makes or implies an architectural decision.
 
@@ -49,7 +52,9 @@ Ask about each of these in turn. Do not batch them into a single wall-of-text qu
 
 ## 4. Write the config
 
-Create the docs directory and write `docs/groundwork/config.json`:
+If `docs/groundwork/config.json` doesn't exist yet, create the docs directory and write it fresh with every field below. If it already exists (a reconfigure, or the backfill from step 1), **update it in place**: merge only the fields that changed - the ones the user just answered, or `project_type`/`detected_stack` on a backfill - and leave every other existing field exactly as it was. Never regenerate the whole file from this template over an existing config; that's how a backfill run would silently clobber someone's `tracker`, `docs_dir`, `triage_labels`, or `rules_file`.
+
+Full shape of the file:
 
 ```json
 {
