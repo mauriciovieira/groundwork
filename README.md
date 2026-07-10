@@ -31,12 +31,14 @@ This keeps the whole system opt-in from where you sit: nothing groundwork-relate
 | `/groundwork:inception` | Lean Inception, lite: vision, personas, an is/is-not table, an MVP sequence. Writes the first `prd.md`. |
 | `/groundwork:grill` | The relentless interview: sharpens a plan, writing `prd.md`, `adr/` entries, and `glossary.md` as decisions land. |
 | `/groundwork:to-prd` | Synthesizes the current conversation into `prd.md`, no interview - use when you've already talked it through. |
+| `/groundwork:triage` | Sorts inbound issues (needs-triage/needs-info/ready-for-agent/ready-for-human/wontfix) before they reach `to-issues`, or straight into an agent brief when no PRD is needed. |
 | `/groundwork:to-issues` | Breaks `prd.md` + `adr/` into tracer-bullet vertical slices (HITL/AFK, dependency-ordered) and creates them in your tracker. |
 | `/groundwork:build` | Implements the open, unblocked slices with TDD. Sequential by default; `--worktree` and `--parallel` are opt-in. |
 | `/groundwork:validate` | Definition-of-Done gate: every acceptance criterion tested, every slice done or deferred, no ADR violated. |
 | `/groundwork:code-review` | Reviews the diff along a Standards axis and a Spec axis, in parallel, then merges both reports. |
 | `/groundwork:handoff` | Reads or writes `docs/groundwork/STATE.md` to pause and resume work. |
 | `/groundwork:quick` | The escape hatch: does a trivial task directly, no PRD/ADR/issues. |
+| `/groundwork:improve-codebase-architecture` | Periodic architecture review: finds deepening opportunities informed by `glossary.md` and `adr/`, grills the chosen candidate, updates both as decisions land. Not part of the linear flow - run it whenever, not per-feature. |
 
 Three more skills back the orchestrators above but have no slash command of their own, since they're only ever reached from inside one: `grilling` (the interview loop behind `grill`), `tdd` (the red-green-refactor loop behind `build`), and `worktree` (isolated branch-per-slice behind `build --worktree`).
 
@@ -46,6 +48,8 @@ Three more skills back the orchestrators above but have no slash command of thei
 brainstorm ──┬──> inception ──┐
              └──> grill <─────┴──> to-prd
                     │
+triage ─────────────┘
+                    │
                     v
                 to-issues ──> build ──> validate ──> code-review
                                  │
@@ -53,7 +57,7 @@ brainstorm ──┬──> inception ──┐
                              handoff (pause/resume, any point)
 ```
 
-`quick` sits outside this flow entirely, for anything too small to justify it.
+`quick` sits outside this flow entirely, for anything too small to justify it. `improve-codebase-architecture` also sits outside it - a periodic check you run whenever the codebase feels like it's accumulating friction, not a required stop for any one feature. `triage` feeds `to-issues` when an issue needs a PRD-level slice, but can also skip straight to an agent brief when the issue is already fully specified - `build` reads those directly off the tracker, the same way it reads a `to-issues`-created slice.
 
 ## PRD, ADR, issues - not spec and plan
 

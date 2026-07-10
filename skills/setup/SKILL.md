@@ -69,6 +69,7 @@ Leave both mostly empty; other skills fill them in as work happens. Do not trans
 Tell the user what was created. Suggest a next step based on where they are:
 - Have an idea but no plan yet -> `/groundwork:brainstorm`
 - Already talked through a plan in this conversation -> `/groundwork:to-prd`
+- Have inbound issues already sitting in the tracker -> `/groundwork:triage`
 - Just want setup done for now -> stop here.
 
 Never re-run this interview automatically. If another groundwork skill can't find `docs/groundwork/config.json`, it should tell the user to run `/groundwork:setup` rather than guessing or asking the same questions inline.
