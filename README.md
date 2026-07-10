@@ -31,7 +31,7 @@ This keeps the whole system opt-in from where you sit: nothing groundwork-relate
 | `/groundwork:inception` | Lean Inception, lite: vision, personas, an is/is-not table, an MVP sequence. Writes the first `prd.md`. |
 | `/groundwork:grill` | The relentless interview: sharpens a plan, writing `prd.md`, `adr/` entries, and `glossary.md` as decisions land. |
 | `/groundwork:to-prd` | Synthesizes the current conversation into `prd.md`, no interview - use when you've already talked it through. |
-| `/groundwork:triage` | Sorts inbound issues (needs-triage/needs-info/ready-for-agent/ready-for-human/wontfix) before they reach `to-issues`, or straight into an agent brief when no PRD is needed. |
+| `/groundwork:triage` | Sorts inbound issues through five state roles (`needs-triage`/`needs-info`/`ready-for-agent`/`ready-for-human`/`wontfix` - configurable label strings per role) before they reach `to-issues`, or straight into an agent brief when no PRD is needed. |
 | `/groundwork:to-issues` | Breaks `prd.md` + `adr/` into tracer-bullet vertical slices (HITL/AFK, dependency-ordered) and creates them in your tracker. |
 | `/groundwork:build` | Implements the open, unblocked slices with TDD. Sequential by default; `--worktree` and `--parallel` are opt-in. |
 | `/groundwork:validate` | Definition-of-Done gate: every acceptance criterion tested, every slice done or deferred, no ADR (Architecture Decision Record) violated. |
