@@ -38,7 +38,7 @@ This keeps the whole system opt-in from where you sit: nothing groundwork-relate
 | `/groundwork:handoff` | Reads or writes `docs/groundwork/STATE.md` to pause and resume work. |
 | `/groundwork:quick` | The escape hatch: does a trivial task directly, no PRD/ADR/issues. |
 
-Three more skills back the orchestrators above but have no slash command of their own, since they're only ever reached from inside one: `interview-loop` (the interview loop behind `survey`), `tdd` (the red-green-refactor loop behind `build`), and `worktree` (isolated branch-per-slice behind `build --worktree`).
+Three more skills back the orchestrators above but aren't meant to be invoked directly, since they're only ever reached from inside one: `interview-loop` (the interview loop behind `survey`), `tdd` (the red-green-refactor loop behind `build`), and `worktree` (isolated branch-per-slice behind `build --worktree`).
 
 ## The flow
 
