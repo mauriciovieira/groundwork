@@ -18,7 +18,7 @@ Read `docs/groundwork/config.json`. If it doesn't exist, tell the user to run `/
 `/groundwork:survey` should already have checked this, but repeat it here as a defensive backstop - features can reach `to-issues` by a path that skipped or shortcut `survey` (e.g. straight from `/groundwork:to-prd`).
 
 - `project_type: "existing"` in config, with a `detected_stack` recorded -> satisfied, continue.
-- `project_type: "greenfield"` -> look for one or more **accepted** ADRs (this feature's `adr/`, or a shared project-wide `adr/` if that's how the repo organizes stack choices) that cover, at minimum: application framework/runtime, frontend approach (if applicable), persistence/backend, authentication, deployment assumptions that affect implementation, and whether background processing or a message bus is required.
+- `project_type: "greenfield"` -> look for one or more **accepted** ADRs under the project-wide `docs/groundwork/adr/` (not this feature's own `adr/` - stack decisions are project-wide, per `survey`) that cover, at minimum: application framework/runtime, frontend approach (if applicable), persistence/backend, authentication, deployment assumptions that affect implementation, and whether background processing or a message bus is required.
 - Neither a recorded existing stack nor an accepted greenfield stack decision -> **stop here**. Do not slice, do not create any issues, and do not choose a stack yourself to get past this. Tell the user to run `/groundwork:survey` on this feature to settle the stack first, then come back.
 
 Never invent or default a stack to unblock issue creation. An unresolved stack is a stop condition, not something to guess past.

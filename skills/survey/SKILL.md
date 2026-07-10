@@ -1,6 +1,6 @@
 ---
 name: survey
-description: A rigorous design survey - sharpens a plan through a one-question-at-a-time interview until it holds up. Writes and updates prd.md, creates adr/ entries per decision, and adds terms to glossary.md as a byproduct.
+description: A rigorous design survey - sharpens a plan through a one-question-at-a-time interview until it holds up. Writes and updates prd.md, creates feature-scoped or project-wide adr/ entries per decision, and adds terms to glossary.md as a byproduct.
 disable-model-invocation: true
 argument-hint: "[feature-slug]"
 ---
@@ -28,7 +28,7 @@ Follow the `groundwork:interview-loop` loop: one question at a time, both branch
 Don't batch this to the end. As soon as a decision resolves:
 
 - **Shapes the problem, users, goals, non-goals, or an acceptance criterion** -> update `docs/groundwork/features/NNNN-slug/prd.md` immediately.
-- **An architectural, technical, or process decision with a real tradeoff** (the kind someone will ask "why did we do it this way" about later) -> write a new `docs/groundwork/features/NNNN-slug/adr/MMMM-title.md` in Nygard format:
+- **An architectural, technical, or process decision with a real tradeoff** (the kind someone will ask "why did we do it this way" about later) -> write a new ADR in Nygard format:
 
   ```markdown
   # MMMM. Title
@@ -46,7 +46,11 @@ Don't batch this to the end. As soon as a decision resolves:
   What becomes easier or harder as a result.
   ```
 
-  Number ADRs with a four-digit sequence scoped to that feature's `adr/` directory, starting at `0001`. ADRs are **append-only** once `Accepted`: never edit a decided ADR's Decision or Consequences after the fact. If the user changes their mind later, write a *new* ADR that supersedes it, and go back and change only the old ADR's Status line to `Superseded by ADR-MMMM`.
+  Two locations, by scope:
+  - **Feature-specific** (only this feature is affected) -> `docs/groundwork/features/NNNN-slug/adr/MMMM-title.md`, numbered with a four-digit sequence scoped to that feature's `adr/` directory, starting at `0001`.
+  - **The implementation stack itself** (application framework/runtime, frontend approach, persistence/backend, authentication, deployment assumptions, background processing/message bus) -> always `docs/groundwork/adr/MMMM-title.md`, the same project-wide directory `improve-codebase-architecture` uses, sequenced independently of any feature - even when this is the first feature to decide it. A stack decision isn't specific to the feature that happened to trigger it, and later features' implementation-readiness check (below) reads from this directory, not from the deciding feature's own `adr/`.
+
+  ADRs are **append-only** once `Accepted`, in either location: never edit a decided ADR's Decision or Consequences after the fact. If the user changes their mind later, write a *new* ADR that supersedes it, and go back and change only the old ADR's Status line to `Superseded by ADR-MMMM`.
 
 - **Introduces or sharpens a domain term** -> add or update an entry in `docs/groundwork/glossary.md`.
 
@@ -57,7 +61,7 @@ Write everything in the language the conversation has been in. No em dashes in a
 Before this feature can be declared ready for `/groundwork:to-issues`, confirm the implementation stack is actually settled - not just the product decisions above:
 
 - Read `project_type` from `docs/groundwork/config.json`. If it's `"existing"`, the `detected_stack` that `/groundwork:setup` recorded already answers this for anything the feature doesn't clearly push outside it. If the feature does need something the existing stack doesn't have (a new external service, a new datastore, etc.), interrogate that gap like any other decision and write the resulting ADR.
-- If `project_type` is `"greenfield"`, confirm one or more **accepted** ADRs (under this feature's `adr/`, or a shared project-wide `adr/` if that's how this repo organizes stack choices) explicitly cover, at minimum: application framework/runtime, frontend approach (if the feature has one), persistence/backend, authentication, deployment assumptions that affect implementation, and whether background processing or a message bus is required. Anything on that list still open is an unresolved branch of the interview, same as any other - interrogate it and write the ADR before moving on, don't wave it through.
+- If `project_type` is `"greenfield"`, confirm one or more **accepted** ADRs under the project-wide `docs/groundwork/adr/` explicitly cover, at minimum: application framework/runtime, frontend approach (if the feature has one), persistence/backend, authentication, deployment assumptions that affect implementation, and whether background processing or a message bus is required. Anything on that list still open is an unresolved branch of the interview, same as any other - interrogate it and write the ADR (to `docs/groundwork/adr/`, per step 3 above) before moving on, don't wave it through. Once an earlier feature has settled the stack there, later features just read it - the interview only needs to cover ground this project-wide directory doesn't already answer.
 
 This is a hard stop condition: do not reach the hand-off step below with a greenfield stack still undecided, and never pick a stack yourself to close the gap - that decision belongs to the interview, made with the user.
 
