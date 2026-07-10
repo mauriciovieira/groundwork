@@ -41,7 +41,7 @@ Five **state** roles:
 
 Every triaged issue should carry exactly one category role and one state role. If state roles conflict, flag it and ask the maintainer before doing anything else.
 
-These are canonical role names - the actual label strings used in the issue tracker come from `docs/groundwork/config.json`'s `triage_labels` field. If that field is empty, each role's label string equals its name; tell the user to run `/groundwork:setup` to override any of them.
+These are canonical role names - the actual label strings used in the issue tracker come from `docs/groundwork/config.json`'s `triage_role_labels` field (not `triage_labels`, which is a separate, unrelated list `to-issues` applies to every issue it creates). If a role is missing from `triage_role_labels` (or the field is empty), that role's label string equals its own name; tell the user to run `/groundwork:setup` to override any of them.
 
 State transitions: an unlabeled issue normally goes to `needs-triage` first; from there it moves to `needs-info`, `ready-for-agent`, `ready-for-human`, or `wontfix`. `needs-info` returns to `needs-triage` once the reporter replies. The maintainer can override at any time - flag transitions that look unusual and ask before proceeding.
 

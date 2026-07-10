@@ -29,7 +29,9 @@ Ask about each of these in turn. Do not batch them into a single wall-of-text qu
 
 **Docs location.** Default `docs/groundwork/`. Accept an override, but keep it a single directory - the whole layout in this skill assumes one root.
 
-**Triage labels.** Optional. Only meaningful for `github`/`linear`. A short list of labels to apply to created issues (e.g. `needs-triage`). Skip for `local`.
+**Triage labels.** Optional. Only meaningful for `github`/`linear`. A short list of labels `to-issues` applies to every issue it creates (e.g. `needs-triage`). Skip for `local`.
+
+**Triage role labels.** Optional, and a separate thing from the list above - only ask if the user says they'll use `/groundwork:triage`. `triage` moves an issue through five canonical roles (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`) and needs to know the actual label string for each one. Default: each role's label equals its name. Ask if any should map to a different existing label in this repo's tracker (e.g. role `needs-triage` -> label `bug:triage`); only record the ones that differ.
 
 **Rules file.** Where repo-level rules live:
 - `claude` (default): groundwork writes `CLAUDE.md` at the repo root. Right choice for a Claude-only repo.
@@ -45,11 +47,12 @@ Create the docs directory and write `docs/groundwork/config.json`:
   "tracker": "github",
   "docs_dir": "docs/groundwork",
   "triage_labels": [],
+  "triage_role_labels": {},
   "rules_file": "claude"
 }
 ```
 
-Adjust fields to what was chosen. For `tracker: "github"`, you may add a `"github": {"repo": "owner/name"}` block detected from the remote. For `tracker: "linear"`, add `"linear": {"team": "..."}` if the user gave one. Never write secrets into this file.
+Adjust fields to what was chosen. For `tracker: "github"`, you may add a `"github": {"repo": "owner/name"}` block detected from the remote. For `tracker: "linear"`, add `"linear": {"team": "..."}` if the user gave one. `triage_role_labels` only needs entries for roles whose label differs from its own name - leave it `{}` if none do. Never write secrets into this file.
 
 ## 4. Seed the docs
 
