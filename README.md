@@ -76,7 +76,7 @@ docs/groundwork/
   STATE.md
   quicklog.md            # only if you've used /groundwork:quick with logging
   adr/                   # system-wide decisions, not tied to one feature
-    0001-title.md        # written by improve-codebase-architecture; created lazily
+    0001-title.md        # improve-codebase-architecture or survey (stack decisions); created lazily
   features/
     0001-example-slug/
       prd.md
