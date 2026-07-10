@@ -21,6 +21,8 @@ Pull from the configured tracker:
 - `linear`: query via the Linear MCP tools for open issues in this feature whose blockers are resolved.
 - `local`: parse `docs/groundwork/features/NNNN-slug/tasks.md` for slices with `Status: open` whose `Blocked-by` slices are already `Status: done`.
 
+If this repo also uses `/groundwork:triage`, the tracker will contain raw inbound issues too - ones still sitting in `needs-triage`, `needs-info`, or otherwise not yet through the triage state machine. Skip anything without a `Type: AFK`/`HITL` field: no `Type` means it isn't a buildable slice or Agent Brief yet, just an unprocessed report. Don't attempt to build it.
+
 If nothing is unblocked, say so and stop - don't force a blocked slice through.
 
 An open issue is workable whether it came from `to-issues` (a `- Type: AFK`/`HITL` line in the issue body, pointing back to a `prd.md`) or from `/groundwork:triage` (a `**Type:** AFK`/`HITL` line inside its own Agent Brief comment, with no PRD at all) - the format differs, but both carry a `Type` field somewhere in the issue, so look for it in whichever place applies and treat the two sources identically from here on.
