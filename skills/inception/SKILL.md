@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # groundwork:inception
 
-A single focused pass for a greenfield idea, not a multi-day workshop. By the end you'll have a first-draft `prd.md`. Use `/groundwork:grill` afterward to interrogate it further if the idea has any real ambiguity left.
+A single focused pass for a greenfield idea, not a multi-day workshop. By the end you'll have a first-draft `prd.md`. Use `/groundwork:survey` afterward to interrogate it further if the idea has any real ambiguity left.
 
 ## 0. Preconditions
 
@@ -34,7 +34,7 @@ Build this table with the user - it's the fastest way to surface scope disagreem
 
 ## 4. MVP sequencer
 
-Order the work into thin, end-to-end slices by value and risk, not by layer. A slice cuts through every layer it touches (schema, API, UI, whatever applies) - never "build the database" as one slice and "build the UI" as another. Sequence the riskiest and highest-value slices first. This list is a starting sequence, not final acceptance criteria - `to-issues` will turn it into real tracer-bullet issues later, and `grill` may reorder or split it.
+Order the work into thin, end-to-end slices by value and risk, not by layer. A slice cuts through every layer it touches (schema, API, UI, whatever applies) - never "build the database" as one slice and "build the UI" as another. Sequence the riskiest and highest-value slices first. This list is a starting sequence, not final acceptance criteria - `to-issues` will turn it into real tracer-bullet issues later, and `survey` may reorder or split it.
 
 ## 5. Write prd.md
 
@@ -42,8 +42,8 @@ Determine the feature slug and number: look at `docs/groundwork/features/` for e
 
 Write `docs/groundwork/features/NNNN-slug/prd.md` with sections: Vision, Personas, Is / Is not / Does / Does not, Goals, Non-goals, MVP sequence. Match the language the user has been writing in - do not translate into English if the conversation has been in another language.
 
-Do not write acceptance criteria yet unless the user already stated them clearly; leave that section as a placeholder for `grill` to fill in. Do not use em dashes anywhere in the document.
+Do not write acceptance criteria yet unless the user already stated them clearly; leave that section as a placeholder for `survey` to fill in. Do not use em dashes anywhere in the document.
 
 ## 6. Hand off
 
-Tell the user what was written and where. If the PRD still has real open questions or unstated assumptions, suggest `/groundwork:grill` to sharpen it. If it's already tight enough to act on, suggest `/groundwork:to-issues`.
+Tell the user what was written and where. If the PRD still has real open questions or unstated assumptions, suggest `/groundwork:survey` to sharpen it. If it's already tight enough to act on, suggest `/groundwork:to-issues`.

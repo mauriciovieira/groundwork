@@ -1,6 +1,6 @@
 ---
 name: to-prd
-description: Synthesize the current conversation into prd.md - no interview, just capture what was already discussed. Use when the user has already talked through a plan and doesn't need grill.
+description: Synthesize the current conversation into prd.md - no interview, just capture what was already discussed. Use when the user has already talked through a plan and doesn't need a survey.
 disable-model-invocation: true
 argument-hint: "[feature-slug]"
 ---
@@ -24,7 +24,7 @@ Read back through what's been discussed and pull out, only where it was actually
 - Goals
 - Non-goals / explicitly out-of-scope items
 - Acceptance criteria, if any were stated
-- Any decisions that read as architectural (flag these for the user - they may belong in an ADR via `/groundwork:grill` rather than the PRD body)
+- Any decisions that read as architectural (flag these for the user - they may belong in an ADR via `/groundwork:survey` rather than the PRD body)
 
 Do not fabricate content for a section that wasn't discussed. If acceptance criteria were never mentioned, leave that section as an explicit placeholder and tell the user it's missing rather than inventing plausible-sounding criteria.
 
@@ -36,4 +36,4 @@ If `prd.md` already exists for this feature, merge rather than overwrite: keep e
 
 ## 3. Report gaps and hand off
 
-Tell the user exactly what got captured and, separately, what's missing or thin. If there are real gaps or unstated assumptions, suggest `/groundwork:grill` to interrogate them rather than pretending the PRD is complete. If it's solid, suggest `/groundwork:to-issues`.
+Tell the user exactly what got captured and, separately, what's missing or thin. If there are real gaps or unstated assumptions, suggest `/groundwork:survey` to interrogate them rather than pretending the PRD is complete. If it's solid, suggest `/groundwork:to-issues`.

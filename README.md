@@ -27,9 +27,9 @@ This keeps the whole system opt-in from where you sit: nothing groundwork-relate
 | Command | What it does |
 | --- | --- |
 | `/groundwork:setup` | One-time config: issue tracker, docs location, triage labels, rules file. Run this first. |
-| `/groundwork:brainstorm` | Socratic discovery for a fuzzy idea, one question at a time. Hands off to `inception` or `grill`. |
+| `/groundwork:brainstorm` | Socratic discovery for a fuzzy idea, one question at a time. Hands off to `inception` or `survey`. |
 | `/groundwork:inception` | Lean Inception, lite: vision, personas, an is/is-not table, an MVP sequence. Writes the first `prd.md`. |
-| `/groundwork:grill` | The relentless interview: sharpens a plan, writing `prd.md`, `adr/` entries, and `glossary.md` as decisions land. |
+| `/groundwork:survey` | A rigorous design survey: sharpens a plan through a one-question-at-a-time interview, writing `prd.md`, `adr/` entries, and `glossary.md` as decisions land. |
 | `/groundwork:to-prd` | Synthesizes the current conversation into `prd.md`, no interview - use when you've already talked it through. |
 | `/groundwork:triage` | Sorts inbound issues through five state roles (`needs-triage`/`needs-info`/`ready-for-agent`/`ready-for-human`/`wontfix` - configurable label strings per role) before they reach `to-issues`, or straight into an agent brief when no PRD is needed. |
 | `/groundwork:to-issues` | Breaks `prd.md` + `adr/` into tracer-bullet vertical slices (HITL/AFK, dependency-ordered) and creates them in your tracker. |
@@ -40,13 +40,13 @@ This keeps the whole system opt-in from where you sit: nothing groundwork-relate
 | `/groundwork:quick` | The escape hatch: does a trivial task directly, no PRD/ADR/issues. |
 | `/groundwork:improve-codebase-architecture` | Periodic architecture review: finds deepening opportunities informed by `glossary.md` and `adr/`, grills the chosen candidate, updates both as decisions land. Not part of the linear flow - run it whenever, not per-feature. |
 
-Three more skills back the orchestrators above but have no slash command of their own, since they're only ever reached from inside one: `grilling` (the interview loop behind `grill`), `tdd` (the red-green-refactor loop behind `build`), and `worktree` (isolated branch-per-slice behind `build --worktree`).
+Three more skills back the orchestrators above but aren't meant to be invoked directly, since they're only ever reached from inside one: `interview-loop` (the interview loop behind `survey`), `tdd` (the red-green-refactor loop behind `build`), and `worktree` (isolated branch-per-slice behind `build --worktree`).
 
 ## The flow
 
 ```
 brainstorm ──┬──> inception ──┐
-             └──> grill <─────┴──> to-prd
+             └──> survey <────┴──> to-prd
                     │
 triage ─────────────┘
                     │

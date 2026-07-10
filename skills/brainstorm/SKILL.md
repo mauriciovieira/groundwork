@@ -1,6 +1,6 @@
 ---
 name: brainstorm
-description: Socratic discovery for a fuzzy or new idea - one question at a time, never proposes a solution before the problem is crisp. Hands off to inception or grill when ready.
+description: Socratic discovery for a fuzzy or new idea - one question at a time, never proposes a solution before the problem is crisp. Hands off to inception or survey when ready.
 disable-model-invocation: true
 ---
 
@@ -25,6 +25,6 @@ If partway through it becomes clear this is actually small - a one-file fix, a c
 You'll know it's crisp when you can state, in one or two sentences, who has the problem and what "solved" looks like, and the user agrees that's right. At that point, stop and offer a handoff:
 
 - **Greenfield** (a new feature or product surface, nothing built yet, needs a vision and an MVP sequence) -> offer `/groundwork:inception`.
-- **Sharpening** (there's already a rough plan or design in mind that needs the assumptions and edge cases interrogated) -> offer `/groundwork:grill`.
+- **Sharpening** (there's already a rough plan or design in mind that needs the assumptions and edge cases interrogated) -> offer `/groundwork:survey`.
 
 Ask which fits rather than assuming. Do not start writing PRDs, ADRs, or code yourself in this skill - that's the next orchestrator's job.

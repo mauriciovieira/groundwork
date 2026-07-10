@@ -1,9 +1,9 @@
 ---
-name: grilling
-description: Internal groundwork technique - the relentless one-question-at-a-time interview loop that resolves every branch of a decision tree. Used by groundwork orchestrators such as grill when they need a rigorous interview. Do not invoke on its own outside an active groundwork orchestrator; it has no file-writing behavior by itself.
+name: interview-loop
+description: Internal groundwork technique - the one-question-at-a-time interview loop that resolves every branch of a decision tree. Used by groundwork orchestrators such as survey when they need a rigorous interview. Not a user-invoked command; do not invoke on its own outside an active groundwork orchestrator, and it has no file-writing behavior by itself.
 ---
 
-# groundwork:grilling
+# groundwork:interview-loop
 
 This is the interview technique itself, factored out so more than one orchestrator can use it. It does not write any files - the orchestrator that invokes it decides what to do with each resolved decision.
 

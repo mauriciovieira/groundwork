@@ -1,13 +1,13 @@
 ---
-name: grill
-description: The relentless interview - interrogate a plan or design until it is sharp. Writes and updates prd.md, creates adr/ entries per decision, and adds terms to glossary.md as a byproduct.
+name: survey
+description: A rigorous design survey - sharpens a plan through a one-question-at-a-time interview until it holds up. Writes and updates prd.md, creates adr/ entries per decision, and adds terms to glossary.md as a byproduct.
 disable-model-invocation: true
 argument-hint: "[feature-slug]"
 ---
 
-# groundwork:grill
+# groundwork:survey
 
-Interrogate a plan or design until it's sharp. Use the `groundwork:grilling` technique for the interview loop itself; this skill's job is to run that loop against a specific feature and turn resolved decisions into documents as they land, not to wait until the end.
+Survey a plan or design until it's sharp: a careful, one-question-at-a-time assessment of assumptions, risks, edge cases, and unresolved decisions, the way a site survey precedes construction. Use the `groundwork:interview-loop` technique for the interview itself; this skill's job is to run that loop against a specific feature and turn resolved decisions into documents as they land, not to wait until the end.
 
 ## 0. Preconditions
 
@@ -15,13 +15,13 @@ Read `docs/groundwork/config.json`. If it doesn't exist, tell the user to run `/
 
 Figure out which feature this is: an argument naming a slug, an obviously-current one from context, or if genuinely ambiguous, ask. If no feature exists yet for this idea, ask whether to create one (pick the next `NNNN-slug` under `docs/groundwork/features/`) or whether they meant to run `/groundwork:inception` or `/groundwork:to-prd` first.
 
-## 1. Establish what's being grilled
+## 1. Establish what's being surveyed
 
 Either an existing `prd.md` (read it first, then interrogate what's thin or unstated), or a plan the user is describing fresh in this conversation (interrogate it directly, write the PRD as it firms up).
 
 ## 2. Run the interview
 
-Follow the `groundwork:grilling` loop: one question at a time, both branches of every decision, push on vague answers, chase edge cases. Don't let this skill's file-writing distract from that - the interview is the point, the documents are a byproduct.
+Follow the `groundwork:interview-loop` loop: one question at a time, both branches of every decision, push on vague answers, chase edge cases. Don't let this skill's file-writing distract from that - the interview is the point, the documents are a byproduct.
 
 ## 3. Turn each resolved decision into the right artifact, as it lands
 
@@ -54,7 +54,7 @@ Write everything in the language the conversation has been in. No em dashes in a
 
 ## 4. Stop condition
 
-Stop when the design survives the interview, per the `grilling` discipline's stop condition. Summarize what changed: which PRD sections were touched, which ADRs were created, which glossary terms were added.
+Stop when the design survives the interview, per the `interview-loop` discipline's stop condition. Summarize what changed: which PRD sections were touched, which ADRs were created, which glossary terms were added.
 
 ## 5. Hand off
 
