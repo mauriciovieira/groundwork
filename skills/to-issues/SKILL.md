@@ -27,7 +27,7 @@ Never invent or default a stack to unblock issue creation. An unresolved stack i
 
 ## 2. Gather the input
 
-By default, read `docs/groundwork/features/NNNN-slug/prd.md` and every file under its `adr/`. If the user passed a plan directly instead (as an argument or pasted into the conversation), use that. Either way, make sure you understand the acceptance criteria and any accepted architectural decisions before slicing - re-read anything unclear rather than guessing.
+By default, read `docs/groundwork/features/NNNN-slug/prd.md`, every file under its `adr/`, and every accepted ADR under the project-wide `docs/groundwork/adr/` (this is where stack decisions live, per the preflight above - slicing without them risks cutting slices that contradict the accepted stack). If the user passed a plan directly instead (as an argument or pasted into the conversation), use that. Either way, make sure you understand the acceptance criteria and any accepted architectural decisions before slicing - re-read anything unclear rather than guessing.
 
 ## 3. Slice into tracer bullets
 
