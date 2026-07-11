@@ -8,14 +8,6 @@ All notable changes to this project are documented in this file.
 
 - let a bump:minor/bump:major label override the release type ([#8](https://github.com/mauriciovieira/groundwork/pull/8))
 
-### Fixed
-
-- dedupe squash-merge PR number, link PR refs in changelog (#7) ([#8](https://github.com/mauriciovieira/groundwork/pull/8))
-
-### Changed
-
-- v0.2.3 ([#8](https://github.com/mauriciovieira/groundwork/pull/8))
-
 ## [0.2.3] - 2026-07-11
 
 ### Fixed
