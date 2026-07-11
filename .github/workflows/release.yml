@@ -140,8 +140,8 @@ jobs:
           git fetch origin main
           git rebase origin/main
           git tag "v${NEW_VERSION}"
-          git push origin main
-          git push origin "v${NEW_VERSION}"
+          # --atomic: main and the tag land together, or neither does.
+          git push --atomic origin main "v${NEW_VERSION}"
 
       - name: Create GitHub release
         env:
