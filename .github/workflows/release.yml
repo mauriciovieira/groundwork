@@ -41,10 +41,10 @@ jobs:
           IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
           NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))"
 
-          jq --arg v "$NEW_VERSION" '.version = $v' .claude-plugin/plugin.json > /tmp/plugin.json
+          jq --indent 2 --arg v "$NEW_VERSION" '.version = $v' .claude-plugin/plugin.json > /tmp/plugin.json
           mv /tmp/plugin.json .claude-plugin/plugin.json
 
-          jq --arg v "$NEW_VERSION" '.plugins[0].version = $v' .claude-plugin/marketplace.json > /tmp/marketplace.json
+          jq --indent 2 --arg v "$NEW_VERSION" '.plugins[0].version = $v' .claude-plugin/marketplace.json > /tmp/marketplace.json
           mv /tmp/marketplace.json .claude-plugin/marketplace.json
 
           echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
@@ -54,7 +54,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          RANGE="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }}"
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          MERGE_SHA="${{ github.event.pull_request.merge_commit_sha }}"
+          # merge_commit_sha is empty for "Rebase and merge" (no merge commit
+          # is created); fall back to the just-checked-out main tip so the
+          # release still cuts instead of failing git log on an invalid range.
+          RANGE="${BASE_SHA}..${MERGE_SHA:-HEAD}"
           PR_NUMBER="${{ github.event.pull_request.number }}"
 
           FEATURES=""

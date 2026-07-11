@@ -12,7 +12,7 @@ All notable changes to this project are documented in this file.
 ### Changed
 
 - rename grill to survey, grilling to interview-loop (#2)
-- Bump plugin version to 0.2.0 (#4)
+- bump plugin version to 0.2.0 (#4)
 
 ## [0.1.0] - 2026-07-09
 
