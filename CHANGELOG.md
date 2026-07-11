@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.6] - 2026-07-11
+
+### Changed
+
+- remove the handoff skill and STATE.md ([#10](https://github.com/mauriciovieira/groundwork/pull/10))
+
 ## [0.2.5] - 2026-07-11
 
 ### Fixed
