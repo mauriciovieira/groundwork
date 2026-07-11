@@ -80,11 +80,9 @@ Set `project_type` to `"existing"` or `"greenfield"` per step 2. Only include `d
 
 ## 5. Seed the docs
 
-If they don't already exist, create:
-- `docs/groundwork/glossary.md` from `${CLAUDE_SKILL_DIR}/templates/glossary.md`
-- `docs/groundwork/STATE.md` from `${CLAUDE_SKILL_DIR}/templates/STATE.md`
+If it doesn't already exist, create `docs/groundwork/glossary.md` from `${CLAUDE_SKILL_DIR}/templates/glossary.md`.
 
-Leave both mostly empty; other skills fill them in as work happens. Do not translate or rewrite the template headers - later skills add content in whatever language the conversation is in, not a language baked in here.
+Leave it mostly empty; other skills fill it in as work happens. Do not translate or rewrite the template headers - later skills add content in whatever language the conversation is in, not a language baked in here.
 
 ## 6. Write the rules file
 

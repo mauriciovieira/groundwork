@@ -36,7 +36,6 @@ This keeps the whole system opt-in from where you sit: nothing groundwork-relate
 | `/groundwork:build` | Implements the open, unblocked slices with TDD. Sequential by default; `--worktree` and `--parallel` are opt-in. |
 | `/groundwork:validate` | Definition-of-Done gate: every acceptance criterion tested, every slice done or deferred, no ADR (Architecture Decision Record) violated. |
 | `/groundwork:code-review` | Reviews the diff along a Standards axis and a Spec axis, in parallel, then merges both reports. |
-| `/groundwork:handoff` | Reads or writes `docs/groundwork/STATE.md` to pause and resume work. |
 | `/groundwork:quick` | The escape hatch: does a trivial task directly, no PRD/ADR/issues. |
 | `/groundwork:improve-codebase-architecture` | Periodic architecture review: finds deepening opportunities informed by `glossary.md` and `adr/`, interviews through the chosen candidate, updates both as decisions land. Not part of the linear flow - run it whenever, not per-feature. |
 
@@ -52,9 +51,6 @@ triage ─────────────┘
                     │
                     v
                 to-issues ──> build ──> validate ──> code-review
-                                 │
-                                 v
-                             handoff (pause/resume, any point)
 ```
 
 `quick` sits outside this flow entirely, for anything too small to justify it. `improve-codebase-architecture` also sits outside it - a periodic check you run whenever the codebase feels like it's accumulating friction, not a required stop for any one feature. `triage` feeds `to-issues` when an issue needs a PRD-level slice, but can also skip straight to an agent brief when the issue is already fully specified - `build` reads those directly off the tracker alongside `to-issues` slices, in whatever format each carries its `Type` field.
@@ -73,7 +69,6 @@ triage ─────────────┘
 docs/groundwork/
   config.json
   glossary.md
-  STATE.md
   quicklog.md            # only if you've used /groundwork:quick with logging
   adr/                   # system-wide decisions, not tied to one feature
     0001-title.md        # improve-codebase-architecture or survey (stack decisions); created lazily

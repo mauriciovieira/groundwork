@@ -73,4 +73,4 @@ Stop when the design survives the interview, per the `interview-loop` discipline
 
 ## 6. Hand off
 
-Once the plan is sharp and implementation-ready, suggest `/groundwork:to-issues` to break it into work. If the user wants to keep refining later, mention `/groundwork:handoff` to save state before stopping. If the readiness check above is still unsatisfied, say so plainly instead of suggesting `to-issues`.
+Once the plan is sharp and implementation-ready, suggest `/groundwork:to-issues` to break it into work. If the readiness check above is still unsatisfied, say so plainly instead of suggesting `to-issues`.

@@ -54,4 +54,4 @@ If implementing a slice reveals that the PRD or an accepted ADR is wrong, incomp
 
 ## 6. Hand off
 
-Once the slices in scope for this pass are done, suggest `/groundwork:validate` to check the Definition of Done, or `/groundwork:code-review` to review the diff. Suggest `/groundwork:handoff` if stopping mid-feature.
+Once the slices in scope for this pass are done, suggest `/groundwork:validate` to check the Definition of Done, or `/groundwork:code-review` to review the diff.
