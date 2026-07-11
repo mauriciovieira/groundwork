@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.3] - 2026-07-11
+
+### Fixed
+
+- dedupe squash-merge PR number, link PR refs in changelog ([#7](https://github.com/mauriciovieira/groundwork/pull/7))
+
 ## [0.2.2] - 2026-07-11
 
 ### Fixed
