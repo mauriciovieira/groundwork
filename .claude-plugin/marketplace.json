@@ -10,7 +10,7 @@
       "name": "groundwork",
       "source": "./",
       "description": "Opt-in, spec-driven development framework for Claude Code: Socratic discovery, PRDs, ADRs, tracer-bullet issues, TDD execution, and review. Nothing fires without a slash command.",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "author": {
         "name": "Mauricio Vieira"
       },
