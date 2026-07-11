@@ -15,6 +15,7 @@ concurrency:
 
 permissions:
   contents: write
+  pull-requests: read
 
 jobs:
   release:
@@ -73,15 +74,11 @@ jobs:
 
       - name: Build changelog entry
         id: changelog
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
-          BASE_SHA="${{ github.event.pull_request.base.sha }}"
-          MERGE_SHA="${{ github.event.pull_request.merge_commit_sha }}"
-          # merge_commit_sha is empty for "Rebase and merge" (no merge commit
-          # is created); fall back to the just-checked-out main tip so the
-          # release still cuts instead of failing git log on an invalid range.
-          RANGE="${BASE_SHA}..${MERGE_SHA:-HEAD}"
           PR_NUMBER="${{ github.event.pull_request.number }}"
           PR_LINK="[#${PR_NUMBER}](https://github.com/${{ github.repository }}/pull/${PR_NUMBER})"
 
@@ -93,10 +90,21 @@ jobs:
           # (feat!: / feat(scope)!:) so they don't fall through to OTHER.
           TYPE_REGEX='^([a-z]+)(\([^)]*\))?!?:\ (.*)$'
 
-          # `|| [ -n "$SUBJECT" ]` is required: git log's format output has no
-          # trailing newline, and bash's `read` silently drops an unterminated
-          # final line otherwise - which is exactly why a single-commit PR
-          # (e.g. a squash merge) previously produced an empty changelog entry.
+          # Read the PR's own (pre-squash) commit list from the API instead of
+          # a git rev-range. A range computed from base.sha is only reliable
+          # when the PR branch was rebased right up to the merge - base.sha
+          # reflects whatever the base ref was when GitHub last synced it,
+          # which drifted stale in production and pulled in another PR's
+          # commits (and its own release commit) into this PR's changelog
+          # entry. The commits API returns exactly this PR's commits
+          # regardless of merge strategy or how far main moved underneath it.
+          # select((.parents | length) < 2) drops merge commits (e.g. from
+          # merging main into the branch), same as git log's --no-merges did.
+          #
+          # `|| [ -n "$SUBJECT" ]` is required: the jq output has no trailing
+          # newline, and bash's `read` silently drops an unterminated final
+          # line otherwise - which is exactly why a single-commit PR (e.g. a
+          # squash merge) previously produced an empty changelog entry.
           # SUBJECT is pre-initialized above so the -n test is always well
           # defined under `set -u`, even on a zero-output range.
           while IFS= read -r SUBJECT || [ -n "$SUBJECT" ]; do
@@ -108,16 +116,16 @@ jobs:
               TYPE=""
               DESC="$SUBJECT"
             fi
-            # GitHub's default squash-merge subject already ends with
-            # "(#<PR_NUMBER>)"; strip it before appending our own so squash
-            # merges don't end up with "(#6) (#6)".
+            # A squash-merge's own commit subject would carry a trailing
+            # "(#<PR_NUMBER>)", but these are the PR's pre-squash commits, so
+            # this is only a defensive no-op in the common case.
             DESC="${DESC% (#${PR_NUMBER})}"
             case "$TYPE" in
               feat) FEATURES="${FEATURES}- ${DESC} (${PR_LINK})"$'\n' ;;
               fix) FIXES="${FIXES}- ${DESC} (${PR_LINK})"$'\n' ;;
               *) OTHER="${OTHER}- ${DESC} (${PR_LINK})"$'\n' ;;
             esac
-          done < <(git log "$RANGE" --no-merges --pretty=format:'%s')
+          done < <(gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}/commits" --paginate --jq '.[] | select((.parents | length) < 2) | .commit.message | split("\n")[0]')
 
           {
             echo "## [${{ steps.bump.outputs.new_version }}] - $(date -u +%Y-%m-%d)"
