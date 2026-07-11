@@ -1,7 +1,11 @@
 name: Release
 
 on:
-  pull_request:
+  # pull_request_target (not pull_request) so GITHUB_TOKEN gets write access
+  # and secrets even when the merged PR came from a fork. Safe here: every
+  # step below operates on main's own content (checkout ref: main) and never
+  # checks out or executes code from the PR branch itself.
+  pull_request_target:
     types: [closed]
     branches: [main]
 
@@ -50,7 +54,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          RANGE="${{ github.event.pull_request.base.sha }}..HEAD"
+          RANGE="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }}"
 
           FEATURES=""
           FIXES=""
@@ -112,8 +116,7 @@ jobs:
           fi
 
           {
-            head -n 3 CHANGELOG.md
-            echo
+            head -n 4 CHANGELOG.md
             cat /tmp/changelog-entry.md
             tail -n +5 CHANGELOG.md
           } > /tmp/CHANGELOG.md
@@ -127,6 +130,12 @@ jobs:
 
           git add .claude-plugin/plugin.json .claude-plugin/marketplace.json CHANGELOG.md
           git commit -m "chore(release): v${NEW_VERSION}"
+
+          # concurrency: group already serializes runs of this workflow, so this
+          # guards only against a manual push landing on main mid-job. Tag AFTER
+          # the rebase so it points at the commit that actually lands on main.
+          git fetch origin main
+          git rebase origin/main
           git tag "v${NEW_VERSION}"
           git push origin main
           git push origin "v${NEW_VERSION}"
