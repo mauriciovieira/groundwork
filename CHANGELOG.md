@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.2] - 2026-07-11
+
+### Fixed
+
+- stop dropping the last commit line in changelog generation (#6) (#6)
+
 ## [0.2.1] - 2026-07-11
 
 ### Changed
