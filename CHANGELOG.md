@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.5] - 2026-07-11
+
+### Fixed
+
+- scope changelog to the PR's own commits via the API ([#9](https://github.com/mauriciovieira/groundwork/pull/9))
+- grant pull-requests:read, drop merge commits from PR history ([#9](https://github.com/mauriciovieira/groundwork/pull/9))
+
 ## [0.2.4] - 2026-07-11
 
 ### Added
