@@ -55,13 +55,16 @@ jobs:
           set -euo pipefail
 
           RANGE="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
 
           FEATURES=""
           FIXES=""
           OTHER=""
-          TYPE_REGEX='^([a-z]+)(\([^)]*\))?:\ (.*)$'
+          # Trailing !? matches Conventional Commits breaking-change markers
+          # (feat!: / feat(scope)!:) so they don't fall through to OTHER.
+          TYPE_REGEX='^([a-z]+)(\([^)]*\))?!?:\ (.*)$'
 
-          while IFS='|' read -r SUBJECT HASH; do
+          while IFS= read -r SUBJECT; do
             [ -z "$SUBJECT" ] && continue
             if [[ "$SUBJECT" =~ $TYPE_REGEX ]]; then
               TYPE="${BASH_REMATCH[1]}"
@@ -71,11 +74,11 @@ jobs:
               DESC="$SUBJECT"
             fi
             case "$TYPE" in
-              feat) FEATURES="${FEATURES}- ${DESC} (${HASH})"$'\n' ;;
-              fix) FIXES="${FIXES}- ${DESC} (${HASH})"$'\n' ;;
-              *) OTHER="${OTHER}- ${DESC} (${HASH})"$'\n' ;;
+              feat) FEATURES="${FEATURES}- ${DESC} (#${PR_NUMBER})"$'\n' ;;
+              fix) FIXES="${FIXES}- ${DESC} (#${PR_NUMBER})"$'\n' ;;
+              *) OTHER="${OTHER}- ${DESC} (#${PR_NUMBER})"$'\n' ;;
             esac
-          done < <(git log "$RANGE" --no-merges --pretty=format:'%s|%h')
+          done < <(git log "$RANGE" --no-merges --pretty=format:'%s')
 
           {
             echo "## [${{ steps.bump.outputs.new_version }}] - $(date -u +%Y-%m-%d)"

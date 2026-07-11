@@ -6,16 +6,16 @@ All notable changes to this project are documented in this file.
 
 ### Added
 
-- feat(skills): add triage and improve-codebase-architecture skills (#1)
-- feat: gate issue generation on a settled implementation stack (#3)
+- add triage and improve-codebase-architecture skills (#1)
+- gate issue generation on a settled implementation stack (#3)
 
 ### Changed
 
-- refactor: rename grill to survey, grilling to interview-loop (#2)
+- rename grill to survey, grilling to interview-loop (#2)
 - Bump plugin version to 0.2.0 (#4)
 
 ## [0.1.0] - 2026-07-09
 
 ### Added
 
-- feat: scaffold groundwork spec-driven-development plugin
+- scaffold groundwork spec-driven-development plugin
