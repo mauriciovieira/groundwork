@@ -4,6 +4,10 @@ All notable changes to this project are documented in this file.
 
 ## [0.2.1] - 2026-07-11
 
+### Changed
+
+- add automated patch release workflow and changelog (#5)
+
 ## [0.2.0] - 2026-07-10
 
 ### Added

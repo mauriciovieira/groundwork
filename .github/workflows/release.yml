@@ -65,11 +65,18 @@ jobs:
           FEATURES=""
           FIXES=""
           OTHER=""
+          SUBJECT=""
           # Trailing !? matches Conventional Commits breaking-change markers
           # (feat!: / feat(scope)!:) so they don't fall through to OTHER.
           TYPE_REGEX='^([a-z]+)(\([^)]*\))?!?:\ (.*)$'
 
-          while IFS= read -r SUBJECT; do
+          # `|| [ -n "$SUBJECT" ]` is required: git log's format output has no
+          # trailing newline, and bash's `read` silently drops an unterminated
+          # final line otherwise - which is exactly why a single-commit PR
+          # (e.g. a squash merge) previously produced an empty changelog entry.
+          # SUBJECT is pre-initialized above so the -n test is always well
+          # defined under `set -u`, even on a zero-output range.
+          while IFS= read -r SUBJECT || [ -n "$SUBJECT" ]; do
             [ -z "$SUBJECT" ] && continue
             if [[ "$SUBJECT" =~ $TYPE_REGEX ]]; then
               TYPE="${BASH_REMATCH[1]}"
