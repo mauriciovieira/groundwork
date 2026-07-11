@@ -15,6 +15,7 @@ concurrency:
 
 permissions:
   contents: write
+  pull-requests: read
 
 jobs:
   release:
@@ -97,6 +98,8 @@ jobs:
           # commits (and its own release commit) into this PR's changelog
           # entry. The commits API returns exactly this PR's commits
           # regardless of merge strategy or how far main moved underneath it.
+          # select((.parents | length) < 2) drops merge commits (e.g. from
+          # merging main into the branch), same as git log's --no-merges did.
           #
           # `|| [ -n "$SUBJECT" ]` is required: the jq output has no trailing
           # newline, and bash's `read` silently drops an unterminated final
@@ -122,7 +125,7 @@ jobs:
               fix) FIXES="${FIXES}- ${DESC} (${PR_LINK})"$'\n' ;;
               *) OTHER="${OTHER}- ${DESC} (${PR_LINK})"$'\n' ;;
             esac
-          done < <(gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}/commits" --paginate --jq '.[].commit.message | split("\n")[0]')
+          done < <(gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}/commits" --paginate --jq '.[] | select((.parents | length) < 2) | .commit.message | split("\n")[0]')
 
           {
             echo "## [${{ steps.bump.outputs.new_version }}] - $(date -u +%Y-%m-%d)"
