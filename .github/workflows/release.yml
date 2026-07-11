@@ -61,6 +61,7 @@ jobs:
           # release still cuts instead of failing git log on an invalid range.
           RANGE="${BASE_SHA}..${MERGE_SHA:-HEAD}"
           PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_LINK="[#${PR_NUMBER}](https://github.com/${{ github.repository }}/pull/${PR_NUMBER})"
 
           FEATURES=""
           FIXES=""
@@ -85,10 +86,14 @@ jobs:
               TYPE=""
               DESC="$SUBJECT"
             fi
+            # GitHub's default squash-merge subject already ends with
+            # "(#<PR_NUMBER>)"; strip it before appending our own so squash
+            # merges don't end up with "(#6) (#6)".
+            DESC="${DESC% (#${PR_NUMBER})}"
             case "$TYPE" in
-              feat) FEATURES="${FEATURES}- ${DESC} (#${PR_NUMBER})"$'\n' ;;
-              fix) FIXES="${FIXES}- ${DESC} (#${PR_NUMBER})"$'\n' ;;
-              *) OTHER="${OTHER}- ${DESC} (#${PR_NUMBER})"$'\n' ;;
+              feat) FEATURES="${FEATURES}- ${DESC} (${PR_LINK})"$'\n' ;;
+              fix) FIXES="${FIXES}- ${DESC} (${PR_LINK})"$'\n' ;;
+              *) OTHER="${OTHER}- ${DESC} (${PR_LINK})"$'\n' ;;
             esac
           done < <(git log "$RANGE" --no-merges --pretty=format:'%s')
 
