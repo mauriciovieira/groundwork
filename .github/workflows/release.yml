@@ -1,0 +1,160 @@
+name: Release
+
+on:
+  # pull_request_target (not pull_request) so GITHUB_TOKEN gets write access
+  # and secrets even when the merged PR came from a fork. Safe here: every
+  # step below operates on main's own content (checkout ref: main) and never
+  # checks out or executes code from the PR branch itself.
+  pull_request_target:
+    types: [closed]
+    branches: [main]
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump patch version
+        id: bump
+        run: |
+          set -euo pipefail
+
+          CURRENT_VERSION=$(jq -r '.version' .claude-plugin/plugin.json)
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+          NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))"
+
+          jq --indent 2 --arg v "$NEW_VERSION" '.version = $v' .claude-plugin/plugin.json > /tmp/plugin.json
+          mv /tmp/plugin.json .claude-plugin/plugin.json
+
+          jq --indent 2 --arg v "$NEW_VERSION" '.plugins[0].version = $v' .claude-plugin/marketplace.json > /tmp/marketplace.json
+          mv /tmp/marketplace.json .claude-plugin/marketplace.json
+
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Build changelog entry
+        id: changelog
+        run: |
+          set -euo pipefail
+
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          MERGE_SHA="${{ github.event.pull_request.merge_commit_sha }}"
+          # merge_commit_sha is empty for "Rebase and merge" (no merge commit
+          # is created); fall back to the just-checked-out main tip so the
+          # release still cuts instead of failing git log on an invalid range.
+          RANGE="${BASE_SHA}..${MERGE_SHA:-HEAD}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+
+          FEATURES=""
+          FIXES=""
+          OTHER=""
+          # Trailing !? matches Conventional Commits breaking-change markers
+          # (feat!: / feat(scope)!:) so they don't fall through to OTHER.
+          TYPE_REGEX='^([a-z]+)(\([^)]*\))?!?:\ (.*)$'
+
+          while IFS= read -r SUBJECT; do
+            [ -z "$SUBJECT" ] && continue
+            if [[ "$SUBJECT" =~ $TYPE_REGEX ]]; then
+              TYPE="${BASH_REMATCH[1]}"
+              DESC="${BASH_REMATCH[3]}"
+            else
+              TYPE=""
+              DESC="$SUBJECT"
+            fi
+            case "$TYPE" in
+              feat) FEATURES="${FEATURES}- ${DESC} (#${PR_NUMBER})"$'\n' ;;
+              fix) FIXES="${FIXES}- ${DESC} (#${PR_NUMBER})"$'\n' ;;
+              *) OTHER="${OTHER}- ${DESC} (#${PR_NUMBER})"$'\n' ;;
+            esac
+          done < <(git log "$RANGE" --no-merges --pretty=format:'%s')
+
+          {
+            echo "## [${{ steps.bump.outputs.new_version }}] - $(date -u +%Y-%m-%d)"
+            echo
+            if [ -n "$FEATURES" ]; then
+              echo "### Added"
+              echo
+              printf '%s' "$FEATURES"
+              echo
+            fi
+            if [ -n "$FIXES" ]; then
+              echo "### Fixed"
+              echo
+              printf '%s' "$FIXES"
+              echo
+            fi
+            if [ -n "$OTHER" ]; then
+              echo "### Changed"
+              echo
+              printf '%s' "$OTHER"
+              echo
+            fi
+          } > /tmp/changelog-entry.md
+
+          cat /tmp/changelog-entry.md
+
+      - name: Prepend changelog entry
+        run: |
+          set -euo pipefail
+
+          if [ ! -f CHANGELOG.md ]; then
+            {
+              echo "# Changelog"
+              echo
+              echo "All notable changes to this project are documented in this file."
+              echo
+            } > CHANGELOG.md
+          fi
+
+          {
+            head -n 4 CHANGELOG.md
+            cat /tmp/changelog-entry.md
+            tail -n +5 CHANGELOG.md
+          } > /tmp/CHANGELOG.md
+          mv /tmp/CHANGELOG.md CHANGELOG.md
+
+      - name: Commit, tag, and push
+        run: |
+          set -euo pipefail
+
+          NEW_VERSION="${{ steps.bump.outputs.new_version }}"
+
+          git add .claude-plugin/plugin.json .claude-plugin/marketplace.json CHANGELOG.md
+          git commit -m "chore(release): v${NEW_VERSION}"
+
+          # concurrency: group already serializes runs of this workflow, so this
+          # guards only against a manual push landing on main mid-job. Tag AFTER
+          # the rebase so it points at the commit that actually lands on main.
+          git fetch origin main
+          git rebase origin/main
+          git tag "v${NEW_VERSION}"
+          # --atomic: main and the tag land together, or neither does.
+          git push --atomic origin main "v${NEW_VERSION}"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          NEW_VERSION="${{ steps.bump.outputs.new_version }}"
+          gh release create "v${NEW_VERSION}" \
+            --title "v${NEW_VERSION}" \
+            --notes-file /tmp/changelog-entry.md

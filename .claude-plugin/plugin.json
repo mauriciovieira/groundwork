@@ -10,5 +10,12 @@
   "homepage": "https://github.com/mauriciovieira/groundwork",
   "repository": "https://github.com/mauriciovieira/groundwork",
   "license": "MIT",
-  "keywords": ["spec-driven-development", "prd", "adr", "sdd", "workflow", "tdd"]
+  "keywords": [
+    "spec-driven-development",
+    "prd",
+    "adr",
+    "sdd",
+    "workflow",
+    "tdd"
+  ]
 }

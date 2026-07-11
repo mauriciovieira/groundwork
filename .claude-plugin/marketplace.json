@@ -15,7 +15,14 @@
         "name": "Mauricio Vieira"
       },
       "license": "MIT",
-      "keywords": ["spec-driven-development", "prd", "adr", "sdd", "workflow", "tdd"]
+      "keywords": [
+        "spec-driven-development",
+        "prd",
+        "adr",
+        "sdd",
+        "workflow",
+        "tdd"
+      ]
     }
   ]
 }
