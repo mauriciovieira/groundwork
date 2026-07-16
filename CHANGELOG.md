@@ -2,6 +2,26 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.3.0] - 2026-07-16
+
+### Added
+
+- fold wayfinder's map/ticket planning into survey ([#11](https://github.com/mauriciovieira/groundwork/pull/11))
+
+### Fixed
+
+- apply Copilot round-1 feedback ([#11](https://github.com/mauriciovieira/groundwork/pull/11))
+- apply Copilot round-2 feedback, move attribution to NOTICE ([#11](https://github.com/mauriciovieira/groundwork/pull/11))
+- apply Copilot round-3 feedback ([#11](https://github.com/mauriciovieira/groundwork/pull/11))
+- apply Copilot round-4 feedback ([#11](https://github.com/mauriciovieira/groundwork/pull/11))
+- apply Copilot round-5 feedback ([#11](https://github.com/mauriciovieira/groundwork/pull/11))
+- apply Copilot round-6 feedback ([#11](https://github.com/mauriciovieira/groundwork/pull/11))
+
+### Changed
+
+- credit mattpocock's wayfinder skill in the README ([#11](https://github.com/mauriciovieira/groundwork/pull/11))
+- credit mattpocock/skills and igoruehara/spec-driven in LICENSE ([#11](https://github.com/mauriciovieira/groundwork/pull/11))
+
 ## [0.2.6] - 2026-07-11
 
 ### Changed
