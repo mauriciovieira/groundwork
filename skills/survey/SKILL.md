@@ -77,7 +77,7 @@ Before anything else, state in one or two lines what this map is finding its way
 
 ### Create the map
 
-One tracker issue per feature, holding:
+Check first whether a map already exists for this feature - an open issue titled `Map: <destination>` for `github`/`linear`, or `docs/groundwork/features/NNNN-slug/map.md` already present for `local`. If one does, reuse it: a re-run of `--map` (or any session working this feature's frontier) picks up the existing map rather than creating a second one. Otherwise, create one issue per feature, holding:
 
 ```markdown
 ## Destination
@@ -117,12 +117,12 @@ For every question in "Not yet specified" that's now sharp enough to state preci
 <the decision or investigation this ticket resolves>
 
 - Type: <research|prototype|interview|task>
-- Map: <this feature's map ticket>
+- Map: <link back to the map, per tracker below>
 ```
 
-`Type` and `Map` are plain body fields, not tracker labels - the same convention `to-issues` already uses for its own `Type`/`Blocked-by` fields, so it reads identically regardless of tracker. `Map` is what links the ticket back to its map: reference it the same way `to-issues` references a blocker - `#<number>` for `github`, the equivalent identifier for `linear`, the map's own entry for `local`. Create it per tracker:
+`Type` and `Map` are plain body fields, not tracker labels, and not a native parent/child issue relationship - `github` has no universal concept of one, and it's workspace-dependent on `linear`, so a ticket links back to its map the same explicit way `to-issues` links a slice to its blocker: `#<number>` for `github`, the equivalent identifier for `linear`, the map's own file path (`docs/groundwork/features/NNNN-slug/map.md`) for `local` - a stable identifier every session encodes the same way. Create the ticket per tracker:
 
-- `github`/`linear`: a child issue of the map issue, this body.
+- `github`/`linear`: an issue with this body, linked to the map only via its `Map:` field.
 - `local`: an entry in `docs/groundwork/features/NNNN-slug/tickets.md` with the same `Type`/`Map` fields.
 
 `Type` is one of:
