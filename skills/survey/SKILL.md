@@ -77,7 +77,7 @@ Before anything else, state in one or two lines what this map is finding its way
 
 ### Create the map
 
-Check first whether a map already exists for this feature - an open issue titled `Map: <destination>` for `github`/`linear`, or `docs/groundwork/features/NNNN-slug/map.md` already present for `local`. If one does, reuse it: a re-run of `--map` (or any session working this feature's frontier) picks up the existing map rather than creating a second one. Otherwise, create one issue per feature, holding:
+Check first whether a map already exists for this feature - an open issue titled `Map: <destination>` for `github`/`linear`, or `docs/groundwork/features/NNNN-slug/map.md` already present for `local`. If one does, reuse it: a re-run of `--map` (or any session working this feature's frontier) picks up the existing map rather than creating a second one. Otherwise, create one map artifact per feature - an issue for `github`/`linear`, `docs/groundwork/features/NNNN-slug/map.md` for `local` - holding:
 
 ```markdown
 ## Destination
