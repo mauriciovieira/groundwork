@@ -29,7 +29,7 @@ This keeps the whole system opt-in from where you sit: nothing groundwork-relate
 | `/groundwork:setup` | One-time config: issue tracker, docs location, triage labels, rules file. Run this first. |
 | `/groundwork:brainstorm` | Socratic discovery for a fuzzy idea, one question at a time. Hands off to `inception` or `survey`. |
 | `/groundwork:inception` | Lean Inception, lite: vision, personas, an is/is-not table, an MVP sequence. Writes the first `prd.md`. |
-| `/groundwork:survey` | A rigorous design survey: sharpens a plan through a one-question-at-a-time interview, writing `prd.md`, `adr/` entries, and `glossary.md` as decisions land. |
+| `/groundwork:survey` | A rigorous design survey: sharpens a plan through a one-question-at-a-time interview, writing `prd.md`, `adr/` entries, and `glossary.md` as decisions land. Scales to a tracker-native map of decision tickets (`--map`) when a plan is too big or fuzzy for one session. |
 | `/groundwork:to-prd` | Synthesizes the current conversation into `prd.md`, no interview - use when you've already talked it through. |
 | `/groundwork:triage` | Sorts inbound issues through five state roles (`needs-triage`/`needs-info`/`ready-for-agent`/`ready-for-human`/`wontfix` - configurable label strings per role) before they reach `to-issues`, or straight into an agent brief when no PRD is needed. |
 | `/groundwork:to-issues` | Breaks `prd.md` + `adr/` into tracer-bullet vertical slices (HITL/AFK, dependency-ordered) and creates them in your tracker. |
@@ -78,7 +78,15 @@ docs/groundwork/
       adr/
         0001-title.md
       tasks.md            # only when tracker = local
+      map.md              # only when survey escalated to map speed and tracker = local
+      tickets.md          # only when survey escalated to map speed and tracker = local
 ```
+
+## Two speeds of survey
+
+Most features fit in one continuous interview. `survey` escalates to **map speed** (`--map`, or automatically when a breadth-first pass turns up too much fog for one session) for efforts that don't: it charts a **map** - an issue for `github`/`linear`, or `map.md` for `local` - naming the Destination, Notes, Decisions so far, Not yet specified (the fog of war), and Out of scope - then breaks the fog into **tickets** (issues for `github`/`linear`, `tickets.md` entries for `local`), each referencing the map via a `Map:` body field (not a native parent/child hierarchy - not universal on `github`, workspace-dependent on `linear`) and carrying a `Type:` body field (also not a tracker label, so it reads identically across `github`/`linear`/`local`) valued `research` (an autonomous `researcher` agent gathers a fact), `prototype` (a rough artifact to react to), `interview` (the same one-question-at-a-time loop, scoped to one question), or `task` (prerequisite work blocking a decision). Tickets resolve one at a time - research tickets run in parallel - across as many sessions or contributors as it takes, writing into the exact same `prd.md`/`adr/`/`glossary.md` either speed produces, until the frontier is empty and the way to `to-issues` is clear.
+
+Map speed adapts the [`wayfinder`](https://github.com/mattpocock/skills/blob/main/skills/engineering/wayfinder/SKILL.md) skill by [Matt Pocock](https://github.com/mattpocock) onto groundwork's own artifact model (`prd.md`/`adr/`/`glossary.md`, the existing tracker-agnostic dispatch) instead of introducing a separate one.
 
 ## Tracker-agnostic by design
 
