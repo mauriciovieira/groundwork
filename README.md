@@ -86,6 +86,8 @@ docs/groundwork/
 
 Most features fit in one continuous interview. `survey` escalates to **map speed** (`--map`, or automatically when a breadth-first pass turns up too much fog for one session) for efforts that don't: it charts a **map** - a tracker issue naming the Destination, Notes, Decisions so far, Not yet specified (the fog of war), and Out of scope - then breaks the fog into **tickets**, each a child issue tagged `research` (an autonomous `researcher` agent gathers a fact), `prototype` (a rough artifact to react to), `interview` (the same one-question-at-a-time loop, scoped to one question), or `task` (prerequisite work blocking a decision). Tickets resolve one at a time - research tickets run in parallel - across as many sessions or contributors as it takes, writing into the exact same `prd.md`/`adr/`/`glossary.md` either speed produces, until the frontier is empty and the way to `to-issues` is clear.
 
+Map speed adapts the [`wayfinder`](https://github.com/mattpocock/skills/blob/main/skills/engineering/wayfinder/SKILL.md) skill by [Matt Pocock](https://github.com/mattpocock) onto groundwork's own artifact model (`prd.md`/`adr/`/`glossary.md`, the existing tracker-agnostic dispatch) instead of introducing a separate one.
+
 ## Tracker-agnostic by design
 
 `/groundwork:setup` records one of `github`, `linear`, or `local` in `docs/groundwork/config.json`. Every other skill reads that instead of asking again. `to-issues` and `build` behave identically regardless of destination - only the last step (where an issue actually gets created, and where its status lives) differs: `gh issue create` for `github`, the Linear MCP tools for `linear`, or a checklist in each feature's `tasks.md` for `local`.
