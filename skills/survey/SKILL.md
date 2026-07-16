@@ -104,7 +104,7 @@ One tracker issue per feature, holding:
 Sketch the breadth-first pass from step 3 into "Not yet specified" - this is the fog, not yet tickets. Create the issue per tracker:
 
 - `github`: `gh issue create --title "Map: <destination>" --body "..."`.
-- `linear`: the equivalent via the Linear MCP tools.
+- `linear`: the equivalent via the Linear MCP tools if connected (check via a tool search if unsure what's available); otherwise tell the user what's missing rather than guessing at an API call.
 - `local`: `docs/groundwork/features/NNNN-slug/map.md`.
 
 ### Break the fog into tickets
@@ -118,7 +118,7 @@ For every question in "Not yet specified" that's now sharp enough to state preci
 
 Whatever's still too fuzzy to state that precisely stays in "Not yet specified" rather than being forced into a premature ticket - don't pre-slice the fog.
 
-Wire `Blocked-by` in a second pass, once every ticket has an id (a ticket needs the other's id to reference it): `github` writes it as `Blocked by #<number>` in the body, the same convention `to-issues` uses for slices; `linear` uses the same field via its MCP tools; `local` writes it in the `tickets.md` entry. A ticket is **unblocked** once everything blocking it is closed; the open, unblocked tickets are the **frontier** - the edge of the known, and what's actually takeable next.
+Wire `Blocked-by` in a second pass, once every ticket has an id (a ticket needs the other's id to reference it): `github` writes it as `Blocked by #<number>` in the body, the same convention `to-issues` uses for slices; `linear` uses the same field via its MCP tools, or `Blocked by <identifier>` in the description instead if the tools available don't support a native blocking relation - same fallback `to-issues` documents; `local` writes it in the `tickets.md` entry. A ticket is **unblocked** once everything blocking it is closed; the open, unblocked tickets are the **frontier** - the edge of the known, and what's actually takeable next.
 
 ### Fire research tickets
 
@@ -126,7 +126,7 @@ For every `research` ticket just created, dispatch the `researcher` agent - conc
 
 ### Work the frontier
 
-Never resolve more than one ticket per session, except research tickets, which can run in parallel and finish whenever they finish. Per ticket:
+Work exactly one non-research ticket per session. Research tickets are the one exception: dispatched in the previous step, they run asynchronously alongside whichever ticket the session is working, and may finish before, during, or after it. Per ticket:
 
 1. **Claim it** (assign it to yourself, for `github`/`linear` - signals other concurrent sessions to skip it; moot for `local`, which only ever has one session working it at a time).
 2. **Resolve it** with the technique its `Type` calls for, above.
@@ -135,7 +135,7 @@ Never resolve more than one ticket per session, except research tickets, which c
 5. **Graduate the fog**: anything in "Not yet specified" the resolution just made specifiable becomes a fresh ticket (create, then wire its `Blocked-by` in the next pass); clear it from "Not yet specified" once it has a ticket of its own.
 6. **Rule out of scope, don't resolve, anything past the destination**: if this ticket (or another one already open) turns out to sit beyond what "Name the destination" scoped in, close it and add one line to "Out of scope" instead - the gist and why, linking the closed ticket. It never enters "Decisions so far".
 
-Stop the session once the ticket(s) claimed this pass are resolved - working the rest of the frontier is the next session's job, or a concurrent one already running.
+Stop the session once the one non-research ticket claimed this pass is resolved (any research tickets dispatched alongside it may still be running) - working the rest of the frontier is the next session's job, or a concurrent one already running.
 
 ## 6. Implementation-readiness check
 
