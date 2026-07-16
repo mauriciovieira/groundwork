@@ -116,11 +116,11 @@ For every question in "Not yet specified" that's now sharp enough to state preci
 
 <the decision or investigation this ticket resolves>
 
-- Type: research
-- Map: #<map-issue-number>
+- Type: <research|prototype|interview|task>
+- Map: <this feature's map ticket>
 ```
 
-`Type` and `Map` are plain body fields, not tracker labels - the same convention `to-issues` already uses for its own `Type`/`Blocked-by` fields, so it reads identically regardless of tracker. `Map` is what links the ticket back to its map: `#<number>` for `github`, the equivalent identifier reference for `linear`. Create it per tracker:
+`Type` and `Map` are plain body fields, not tracker labels - the same convention `to-issues` already uses for its own `Type`/`Blocked-by` fields, so it reads identically regardless of tracker. `Map` is what links the ticket back to its map: reference it the same way `to-issues` references a blocker - `#<number>` for `github`, the equivalent identifier for `linear`, the map's own entry for `local`. Create it per tracker:
 
 - `github`/`linear`: a child issue of the map issue, this body.
 - `local`: an entry in `docs/groundwork/features/NNNN-slug/tickets.md` with the same `Type`/`Map` fields.
