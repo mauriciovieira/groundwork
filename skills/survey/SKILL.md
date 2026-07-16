@@ -77,7 +77,7 @@ Before anything else, state in one or two lines what this map is finding its way
 
 ### Create the map
 
-Check first whether a map already exists for this feature - an open issue titled `Map: <destination>` for `github`/`linear`, or `docs/groundwork/features/NNNN-slug/map.md` already present for `local`. If one does, reuse it: a re-run of `--map` (or any session working this feature's frontier) picks up the existing map rather than creating a second one. Otherwise, create one map artifact per feature - an issue for `github`/`linear`, `docs/groundwork/features/NNNN-slug/map.md` for `local` - holding:
+Check first whether a map already exists for this feature - an open issue titled `Map: NNNN-slug - <destination>` for `github`/`linear`, or `docs/groundwork/features/NNNN-slug/map.md` already present for `local`. The feature's own `NNNN-slug` in the title is what makes the reuse check and cross-linking unambiguous when two features happen to share similar destination wording. If a map already exists, reuse it: a re-run of `--map` (or any session working this feature's frontier) picks up the existing map rather than creating a second one. Otherwise, create one map artifact per feature - an issue for `github`/`linear`, `docs/groundwork/features/NNNN-slug/map.md` for `local` - holding:
 
 ```markdown
 ## Destination
@@ -103,7 +103,7 @@ Check first whether a map already exists for this feature - an open issue titled
 
 Sketch the fog into "Not yet specified": whatever breadth-first pass step 3 already took, or - if `--map` skipped straight here without one - take that same breadth-first pass now instead. Either way, this is the fog, not yet tickets. Create the issue per tracker:
 
-- `github`: `gh issue create --title "Map: <destination>" --body "..."`.
+- `github`: `gh issue create --title "Map: NNNN-slug - <destination>" --body "..."`.
 - `linear`: the equivalent via the Linear MCP tools if connected (check via a tool search if unsure what's available); otherwise tell the user what's missing rather than guessing at an API call.
 - `local`: `docs/groundwork/features/NNNN-slug/map.md`.
 
