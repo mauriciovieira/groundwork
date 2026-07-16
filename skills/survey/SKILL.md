@@ -101,7 +101,7 @@ One tracker issue per feature, holding:
 <!-- work ruled beyond the destination - gist plus why, linking the closed ticket -->
 ```
 
-Sketch the breadth-first pass from step 3 into "Not yet specified" - this is the fog, not yet tickets. Create the issue per tracker:
+Sketch the fog into "Not yet specified": whatever breadth-first pass step 3 already took, or - if `--map` skipped straight here without one - take that same breadth-first pass now instead. Either way, this is the fog, not yet tickets. Create the issue per tracker:
 
 - `github`: `gh issue create --title "Map: <destination>" --body "..."`.
 - `linear`: the equivalent via the Linear MCP tools if connected (check via a tool search if unsure what's available); otherwise tell the user what's missing rather than guessing at an API call.
@@ -109,7 +109,23 @@ Sketch the breadth-first pass from step 3 into "Not yet specified" - this is the
 
 ### Break the fog into tickets
 
-For every question in "Not yet specified" that's now sharp enough to state precisely - even if it's blocked and can't be worked yet - create a ticket: a child issue of the map (or an entry in `docs/groundwork/features/NNNN-slug/tickets.md` for `local`), body just the question, tagged with a `Type`:
+For every question in "Not yet specified" that's now sharp enough to state precisely - even if it's blocked and can't be worked yet - create a ticket with this body:
+
+```markdown
+## Question
+
+<the decision or investigation this ticket resolves>
+
+- Type: research
+- Map: #<map-issue-number>
+```
+
+`Type` and `Map` are plain body fields, not tracker labels - the same convention `to-issues` already uses for its own `Type`/`Blocked-by` fields, so it reads identically regardless of tracker. `Map` is what links the ticket back to its map: `#<number>` for `github`, the equivalent identifier reference for `linear`. Create it per tracker:
+
+- `github`/`linear`: a child issue of the map issue, this body.
+- `local`: an entry in `docs/groundwork/features/NNNN-slug/tickets.md` with the same `Type`/`Map` fields.
+
+`Type` is one of:
 
 - **`research`** (AFK) - a fact the decision is waiting on, gathered from documentation, an external API, or this codebase. Resolved by the `researcher` agent.
 - **`prototype`** (HITL) - the question is "how should it look/behave", answered by reacting to something concrete. Invoke this session's own prototyping skill or tool if one is available; otherwise sketch the rough artifact - an outline, a stub, a rough take - directly inline.
