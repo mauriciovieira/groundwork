@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.0.0] - 2026-08-10
+
+### Added
+
+- auto-invoke advisory skills, chain orchestrators, lazy-bootstrap config ([#12](https://github.com/mauriciovieira/groundwork/pull/12))
+
+### Fixed
+
+- hand-offs into flagged skills read the SKILL.md directly ([#12](https://github.com/mauriciovieira/groundwork/pull/12))
+- make lazy bootstrap detection explicitly non-interactive ([#12](https://github.com/mauriciovieira/groundwork/pull/12))
+
 ## [0.3.0] - 2026-07-16
 
 ### Added
