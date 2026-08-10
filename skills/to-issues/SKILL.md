@@ -11,14 +11,13 @@ Turn a plan into independently-gradable work items: tracer-bullet vertical slice
 
 ## 0. Preconditions
 
-Read `docs/groundwork/config.json`. If it doesn't exist, tell the user to run `/groundwork:setup` first and stop.
+Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of `${CLAUDE_PLUGIN_ROOT}/skills/setup/SKILL.md`: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. `/groundwork:setup` is only for customizing.
 
 ## 1. Implementation-readiness preflight
 
 `/groundwork:survey` should already have checked this, but repeat it here as a defensive backstop - features can reach `to-issues` by a path that skipped or shortcut `survey` (e.g. straight from `/groundwork:to-prd`).
 
-- `project_type` **missing entirely** from config (written before this check existed) -> **stop here**, but don't send this case to `survey` - the fix is `/groundwork:setup`, re-run so it can detect and record `project_type`/`detected_stack`, then come back to `to-issues`.
-- `project_type: "existing"` but `detected_stack` missing or empty (malformed config, or a `setup` run that didn't complete) -> **stop here**. Don't proceed on a guess - tell the user to re-run `/groundwork:setup` to populate `detected_stack`, then come back.
+- `project_type` **missing entirely** from config, or `"existing"` with `detected_stack` missing or empty -> backfill it in place: run the same implementation-status detection the Lazy bootstrap uses (setup's step 2 - record only what's actually found, never a guess), merge just those fields into the existing config, tell the user in one line, and continue with the cases below.
 - `project_type: "existing"` in config, with a `detected_stack` recorded -> satisfied, continue.
 - `project_type: "greenfield"` -> look for one or more ADRs with `Status: Accepted` under the project-wide `docs/groundwork/adr/` (not this feature's own `adr/` - stack decisions are project-wide, per `survey`) that cover, at minimum: application framework/runtime, frontend approach (if applicable), persistence/backend, authentication, deployment assumptions that affect implementation, and whether background processing or a message bus is required.
 - `project_type: "greenfield"` recorded but no such ADRs exist -> **stop here**. Do not slice, do not create any issues, and do not choose a stack yourself to get past this. Tell the user to run `/groundwork:survey` on this feature to settle the stack first, then come back.
@@ -69,4 +68,4 @@ Once approved, create the items in dependency order (blockers before what they b
 
 ## 7. Hand off
 
-Report what was created and where (issue numbers/links, or the `tasks.md` path). Suggest `/groundwork:build` to start executing the unblocked slices.
+Report what was created and where (issue numbers/links, or the `tasks.md` path). Then offer to continue straight into `build` on the unblocked slices - on a yes, invoke that skill in this session; the slash command is never required.

@@ -11,7 +11,7 @@ Move issues on the configured issue tracker through a small state machine of tri
 
 ## 0. Preconditions
 
-Read `docs/groundwork/config.json`. If it doesn't exist, tell the user to run `/groundwork:setup` first and stop.
+Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of `${CLAUDE_PLUGIN_ROOT}/skills/setup/SKILL.md`: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. `/groundwork:setup` is only for customizing.
 
 This skill assumes an external tracker with real issues, labels, comments, and reporters (`tracker: "github"` or `"linear"`). If `config.json`'s `tracker` is `"local"`, tell the user triage doesn't apply - `local` mode has no inbound-issue concept to sort, only `docs/groundwork/features/NNNN-slug/tasks.md` entries that `to-issues` already created with a type and status - and stop.
 

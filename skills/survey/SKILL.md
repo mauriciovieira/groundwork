@@ -11,7 +11,7 @@ Survey a plan or design until it's sharp: a careful, one-question-at-a-time asse
 
 ## 0. Preconditions
 
-Read `docs/groundwork/config.json`. If it doesn't exist, tell the user to run `/groundwork:setup` first and stop.
+Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of `${CLAUDE_PLUGIN_ROOT}/skills/setup/SKILL.md`: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. `/groundwork:setup` is only for customizing.
 
 Figure out which feature this is: an argument naming a slug, an obviously-current one from context, or if genuinely ambiguous, ask. If no feature exists yet for this idea, ask whether to create one (pick the next `NNNN-slug` under `docs/groundwork/features/`) or whether they meant to run `/groundwork:inception` or `/groundwork:to-prd` first.
 
@@ -157,8 +157,7 @@ Stop the session once the one non-research ticket claimed this pass is resolved 
 
 Before this feature can be declared ready for `/groundwork:to-issues`, confirm the implementation stack is actually settled - not just the product decisions above:
 
-- Read `project_type` from `docs/groundwork/config.json`. If it's **missing entirely** (a config written before this check existed), don't guess which case applies - stop and tell the user to re-run `/groundwork:setup` so it can detect and record `project_type`/`detected_stack`, then come back.
-- If it's `"existing"` but `detected_stack` is missing or empty (a malformed config, or a `setup` run that didn't complete), that's an inconsistent state, not a green light - stop and tell the user to re-run `/groundwork:setup` rather than proceeding on a guess.
+- Read `project_type` from `docs/groundwork/config.json`. If it's **missing entirely**, or it's `"existing"` with `detected_stack` missing or empty, backfill it in place: run the same implementation-status detection the Lazy bootstrap uses (setup's step 2 - record only what's actually found, never a guess), merge just those fields into the existing config, tell the user in one line, and continue.
 - If it's `"existing"` with a populated `detected_stack`, that answers this for anything the feature doesn't clearly push outside it. If the feature does need something the existing stack doesn't have (a new external service, a new datastore, etc.), interrogate that gap like any other decision and write the resulting ADR.
 - If `project_type` is `"greenfield"`, confirm one or more ADRs with `Status: Accepted` under the project-wide `docs/groundwork/adr/` explicitly cover, at minimum: application framework/runtime, frontend approach (if the feature has one), persistence/backend, authentication, deployment assumptions that affect implementation, and whether background processing or a message bus is required. Anything on that list still open is an unresolved branch of the interview, same as any other - interrogate it and write the ADR (to `docs/groundwork/adr/`, per step 2 above) before moving on, don't wave it through. Once an earlier feature has settled the stack there, later features just read it - the interview only needs to cover ground this project-wide directory doesn't already answer.
 
@@ -174,4 +173,4 @@ Either way, summarize what changed: which PRD sections were touched, which ADRs 
 
 ## 8. Hand off
 
-Once the plan is sharp and implementation-ready, suggest `/groundwork:to-issues` to break it into work. If the readiness check above is still unsatisfied, say so plainly instead of suggesting `to-issues`.
+Once the plan is sharp and implementation-ready, offer to continue straight into `to-issues` to break it into work - on a yes, invoke that skill in this session rather than waiting for the slash command. If the readiness check above is still unsatisfied, say so plainly and don't offer it.

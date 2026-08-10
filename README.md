@@ -1,8 +1,8 @@
 # groundwork
 
-A lightweight, opt-in, spec-driven development framework for Claude Code. It turns "let's build X" into a PRD (Product Requirements Document), sharpened by an interview, broken into small vertical slices, built with TDD (Test-Driven Development), and reviewed against both the code standards and the spec that motivated it - as much or as little of that as you actually invoke.
+A lightweight, spec-driven development framework for Claude Code. It turns "let's build X" into a PRD (Product Requirements Document), sharpened by an interview, broken into small vertical slices, built with TDD (Test-Driven Development), and reviewed against both the code standards and the spec that motivated it - as much or as little of that as a task actually needs.
 
-groundwork never starts on its own. Every part of it is a skill you invoke explicitly with a `/groundwork:...` command; none of it auto-fires from a plain request, and an orchestrator never chains into another orchestrator without you typing the next command yourself. If you never type `/groundwork:anything`, groundwork has no effect on your session.
+Since 1.0, groundwork meets you halfway instead of waiting for commands. The advisory skills (`brainstorm`, `to-prd`, `quick`, `validate`, `code-review`) fire on their own when a request matches their trigger, orchestrators flow into each other instead of waiting for you to type the next command, and the first groundwork skill you touch bootstraps its own config with detected defaults. Every step with real side effects - creating tracker issues, building code, spawning parallel agents - still waits for an inline confirmation, and every skill remains directly invocable as a `/groundwork:...` command when you want to steer.
 
 ## Install
 
@@ -11,22 +11,22 @@ groundwork never starts on its own. Every part of it is a skill you invoke expli
 /plugin install groundwork
 ```
 
-Then run `/groundwork:setup` once per repository before anything else.
+Optionally run `/groundwork:setup` to customize the per-repository defaults (tracker, docs location, labels, rules file). If you skip it, the first groundwork skill you use bootstraps a config with detected defaults and tells you what it assumed.
 
 ## Two tiers of skill
 
 Every groundwork skill is one of two kinds:
 
-- **Orchestrators** are user-invoked only (`disable-model-invocation: true` in their frontmatter). They run only when you type the slash command - Claude may *suggest* one when your request looks like it needs the process, but never starts one on its own. An orchestrator can call disciplines, never another orchestrator.
-- **Disciplines** are reusable techniques Claude can reach for while executing an orchestrator you already invoked - the interview loop, the TDD cycle, worktree management. Their descriptions are scoped tightly to groundwork's own workflows, so in practice they only ever fire from inside an orchestrator, not from a cold prompt.
+- **Orchestrators** drive a stage of the flow. The advisory ones - `brainstorm`, `to-prd`, `quick`, `validate`, `code-review` - are model-invoked: Claude starts them on its own when your request matches their trigger. The side-effectful or interview-heavy ones - `setup`, `inception`, `survey`, `triage`, `to-issues`, `build`, `improve-codebase-architecture` - keep `disable-model-invocation: true` and start only from your slash command or from another orchestrator handing off. Orchestrators flow into each other: read-only follow-ups (`build` into `validate` into `code-review`) chain automatically, and anything with side effects asks once, inline, before proceeding.
+- **Disciplines** are reusable techniques Claude can reach for while executing an orchestrator - the interview loop, the TDD cycle, worktree management. Their descriptions are scoped tightly to groundwork's own workflows, so in practice they only ever fire from inside an orchestrator, not from a cold prompt.
 
-This keeps the whole system opt-in from where you sit: nothing groundwork-related starts unless you typed a `/groundwork:` command first, while orchestrators still get to compose shared, tested building blocks internally.
+The result: you can still drive everything with explicit commands, but a plain "let's build X" is enough for Claude to open the brainstorm, and a finished build flows into its own validation and review without you re-typing commands.
 
 ## Commands
 
 | Command | What it does |
 | --- | --- |
-| `/groundwork:setup` | One-time config: issue tracker, docs location, triage labels, rules file. Run this first. |
+| `/groundwork:setup` | Optional config: issue tracker, docs location, triage labels, rules file. Skills bootstrap defaults on first use; run this to customize. |
 | `/groundwork:brainstorm` | Socratic discovery for a fuzzy idea, one question at a time. Hands off to `inception` or `survey`. |
 | `/groundwork:inception` | Lean Inception, lite: vision, personas, an is/is-not table, an MVP sequence. Writes the first `prd.md`. |
 | `/groundwork:survey` | A rigorous design survey: sharpens a plan through a one-question-at-a-time interview, writing `prd.md`, `adr/` entries, and `glossary.md` as decisions land. Scales to a tracker-native map of decision tickets (`--map`) when a plan is too big or fuzzy for one session. |
@@ -52,6 +52,8 @@ triage ─────────────┘
                     v
                 to-issues ──> build ──> validate ──> code-review
 ```
+
+Since 1.0 the arrows are real hand-offs: an orchestrator offers the next step inline and continues on a yes - and `build` flows into `validate` and `code-review` automatically, since those are read-only. You type the next command only when you want to steer.
 
 `quick` sits outside this flow entirely, for anything too small to justify it. `improve-codebase-architecture` also sits outside it - a periodic check you run whenever the codebase feels like it's accumulating friction, not a required stop for any one feature. `triage` feeds `to-issues` when an issue needs a PRD-level slice, but can also skip straight to an agent brief when the issue is already fully specified - `build` reads those directly off the tracker alongside `to-issues` slices, in whatever format each carries its `Type` field.
 
@@ -90,7 +92,7 @@ Map speed adapts the [`wayfinder`](https://github.com/mattpocock/skills/blob/mai
 
 ## Tracker-agnostic by design
 
-`/groundwork:setup` records one of `github`, `linear`, or `local` in `docs/groundwork/config.json`. Every other skill reads that instead of asking again. `to-issues` and `build` behave identically regardless of destination - only the last step (where an issue actually gets created, and where its status lives) differs: `gh issue create` for `github`, the Linear MCP tools for `linear`, or a checklist in each feature's `tasks.md` for `local`.
+`/groundwork:setup` (or the lazy bootstrap, the first time any skill runs without a config) records one of `github`, `linear`, or `local` in `docs/groundwork/config.json`. Every other skill reads that instead of asking again. `to-issues` and `build` behave identically regardless of destination - only the last step (where an issue actually gets created, and where its status lives) differs: `gh issue create` for `github`, the Linear MCP tools for `linear`, or a checklist in each feature's `tasks.md` for `local`.
 
 ## Rules file: CLAUDE.md by default, AGENTS.md for multi-tool repos
 
@@ -98,7 +100,7 @@ Since groundwork is a Claude Code plugin, `setup` writes `CLAUDE.md` at the repo
 
 ## The escape hatch
 
-Not everything needs a PRD. `/groundwork:quick` does a trivial task directly - no interview, no ADR, no issue breakdown - and optionally appends one line to `docs/groundwork/quicklog.md` if you want a trail of what you've done outside the full process. `brainstorm` and other orchestrators will point you at `quick` themselves when they notice a request is too small for the ceremony.
+Not everything needs a PRD. `/groundwork:quick` does a trivial task directly - no interview, no ADR, no issue breakdown - and optionally appends one line to `docs/groundwork/quicklog.md` if you want a trail of what you've done outside the full process. `brainstorm` and other orchestrators will switch into `quick` themselves (with your ok) when they notice a request is too small for the ceremony - and Claude reaches for `quick` directly on trivial asks in a groundwork repo.
 
 ## Language
 
@@ -109,4 +111,4 @@ groundwork itself - every `SKILL.md`, command, and this README - is written in E
 This plugin was verified against the current official Claude Code plugin documentation at build time. Two things worth calling out if you're extending it:
 
 - Skills are exposed as `/groundwork:<name>` automatically from their `skills/<name>/SKILL.md` location - no separate `commands/` wrapper is needed for a skill to become a slash command.
-- `disable-model-invocation: true` in a plugin skill's frontmatter reliably keeps Claude from auto-invoking it, the same as a personal or project skill.
+- `disable-model-invocation: true` in a plugin skill's frontmatter reliably keeps Claude from auto-invoking it, the same as a personal or project skill. groundwork uses it only on the side-effectful orchestrators; the advisory ones rely on trigger-form descriptions ("Use when...") to be picked up automatically.
