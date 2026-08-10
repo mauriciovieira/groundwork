@@ -68,4 +68,4 @@ Once approved, create the items in dependency order (blockers before what they b
 
 ## 7. Hand off
 
-Report what was created and where (issue numbers/links, or the `tasks.md` path). Then offer to continue straight into `build` on the unblocked slices - on a yes, invoke that skill in this session; the slash command is never required.
+Report what was created and where (issue numbers/links, or the `tasks.md` path). Then offer to continue straight into `build` on the unblocked slices - on a yes, read and follow `${CLAUDE_PLUGIN_ROOT}/skills/build/SKILL.md` in this session; the slash command is never required.

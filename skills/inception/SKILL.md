@@ -48,4 +48,4 @@ Do not write acceptance criteria yet unless the user already stated them clearly
 
 ## 6. Hand off
 
-Tell the user what was written and where, then keep the flow moving: if the PRD still has real open questions or unstated assumptions, offer to continue into `survey` to sharpen it; if it's already tight enough to act on, offer `to-issues`. On a yes, invoke the chosen skill directly in this session - the slash command is never required.
+Tell the user what was written and where, then keep the flow moving: if the PRD still has real open questions or unstated assumptions, offer to continue into `survey` to sharpen it; if it's already tight enough to act on, offer `to-issues`. On a yes, read and follow `${CLAUDE_PLUGIN_ROOT}/skills/<name>/SKILL.md` directly in this session - the slash command is never required.

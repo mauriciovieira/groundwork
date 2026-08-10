@@ -173,4 +173,4 @@ Either way, summarize what changed: which PRD sections were touched, which ADRs 
 
 ## 8. Hand off
 
-Once the plan is sharp and implementation-ready, offer to continue straight into `to-issues` to break it into work - on a yes, invoke that skill in this session rather than waiting for the slash command. If the readiness check above is still unsatisfied, say so plainly and don't offer it.
+Once the plan is sharp and implementation-ready, offer to continue straight into `to-issues` to break it into work - on a yes, read and follow `${CLAUDE_PLUGIN_ROOT}/skills/to-issues/SKILL.md` in this session rather than waiting for the slash command. If the readiness check above is still unsatisfied, say so plainly and don't offer it.

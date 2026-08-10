@@ -35,4 +35,4 @@ If `prd.md` already exists for this feature, merge rather than overwrite: keep e
 
 ## 3. Report gaps and hand off
 
-Tell the user exactly what got captured and, separately, what's missing or thin. If there are real gaps or unstated assumptions, offer to continue into `survey` to interrogate them rather than pretending the PRD is complete. If it's solid, offer `to-issues`. On a yes, invoke the chosen skill directly in this session - don't wait for a slash command.
+Tell the user exactly what got captured and, separately, what's missing or thin. If there are real gaps or unstated assumptions, offer to continue into `survey` to interrogate them rather than pretending the PRD is complete. If it's solid, offer `to-issues`. On a yes, read and follow `${CLAUDE_PLUGIN_ROOT}/skills/<name>/SKILL.md` directly in this session - don't wait for a slash command.
