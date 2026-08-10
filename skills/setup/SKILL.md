@@ -13,7 +13,7 @@ Configure groundwork for this repository. The output is `docs/groundwork/config.
 When any groundwork skill finds no `docs/groundwork/config.json`, it bootstraps one instead of stopping:
 
 1. Detect the tracker: `github` if the repo has a GitHub remote and `gh auth status` succeeds, otherwise `local`. Never assume `linear` - it needs details only the user can give.
-2. Detect implementation status exactly as step 2 below describes: a strong signal present -> `project_type: "existing"` plus a `detected_stack` of what was actually found; otherwise `"greenfield"`, no stack.
+2. Detect implementation status using the same signal heuristics step 2 below describes (strong vs supporting signals), but non-interactively: a strong signal present -> `project_type: "existing"` plus a `detected_stack` of what was actually found; otherwise `"greenfield"`, no stack. Skip step 2's show-and-correct loop - the bootstrap records what it detects and moves on; corrections happen through an explicit `/groundwork:setup` run.
 3. Take every other default: `docs_dir` `docs/groundwork`, `triage_labels` `[]`, `triage_role_labels` `{}`, `rules_file` `claude`.
 4. Write `config.json` in the shape step 4 defines, and seed `glossary.md` per step 5. Skip the rules file - that's an explicit-setup nicety, not a bootstrap need.
 5. Tell the user in one line what was assumed, and that `/groundwork:setup` changes any of it. Then continue with the original task - don't derail into this interview.
