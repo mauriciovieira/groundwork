@@ -1,12 +1,22 @@
 ---
 name: setup
-description: One-time groundwork configuration for this repository - issue tracker, docs location, triage labels, and rules file. Every other groundwork skill reads the result instead of asking again.
+description: Groundwork configuration for this repository - issue tracker, docs location, triage labels, and rules file. Optional - every other skill bootstraps defaults on first use; run this to customize or reconfigure them.
 disable-model-invocation: true
 ---
 
 # groundwork:setup
 
-Configure groundwork for this repository, once. The output is `docs/groundwork/config.json`. Every other groundwork orchestrator reads that file instead of interviewing the user again, so get it right here.
+Configure groundwork for this repository. The output is `docs/groundwork/config.json`. Every other groundwork orchestrator reads that file instead of interviewing the user again. Running this skill is optional: any skill that finds no config bootstraps one with detected defaults (see "Lazy bootstrap" below) - this interview exists to customize or correct those defaults, not to gate the rest of groundwork.
+
+## Lazy bootstrap (used by every other skill)
+
+When any groundwork skill finds no `docs/groundwork/config.json`, it bootstraps one instead of stopping:
+
+1. Detect the tracker: `github` if the repo has a GitHub remote and `gh auth status` succeeds, otherwise `local`. Never assume `linear` - it needs details only the user can give.
+2. Detect implementation status using the same signal heuristics step 2 below describes (strong vs supporting signals), but non-interactively: a strong signal present -> `project_type: "existing"` plus a `detected_stack` of what was actually found; otherwise `"greenfield"`, no stack. Skip step 2's show-and-correct loop - the bootstrap records what it detects and moves on; corrections happen through an explicit `/groundwork:setup` run.
+3. Take every other default: `docs_dir` `docs/groundwork`, `triage_labels` `[]`, `triage_role_labels` `{}`, `rules_file` `claude`.
+4. Write `config.json` in the shape step 4 defines, and seed `glossary.md` per step 5. Skip the rules file - that's an explicit-setup nicety, not a bootstrap need.
+5. Tell the user in one line what was assumed, and that `/groundwork:setup` changes any of it. Then continue with the original task - don't derail into this interview.
 
 ## 1. Check for an existing config
 
@@ -97,4 +107,4 @@ Tell the user what was created. Suggest a next step based on where they are:
 - Have inbound issues already sitting in the tracker -> `/groundwork:triage`
 - Just want setup done for now -> stop here.
 
-Never re-run this interview automatically. If another groundwork skill can't find `docs/groundwork/config.json`, it should tell the user to run `/groundwork:setup` rather than guessing or asking the same questions inline.
+Never re-run this interview automatically. When another groundwork skill can't find `docs/groundwork/config.json`, it follows the Lazy bootstrap above rather than running this interview or asking the same questions inline.

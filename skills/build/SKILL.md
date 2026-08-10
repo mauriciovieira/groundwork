@@ -11,7 +11,7 @@ Implement the slices `to-issues` created - or, for issues `/groundwork:triage` m
 
 ## 0. Preconditions
 
-Read `docs/groundwork/config.json`. If it doesn't exist, tell the user to run `/groundwork:setup` first and stop.
+Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of `${CLAUDE_PLUGIN_ROOT}/skills/setup/SKILL.md`: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. `/groundwork:setup` is only for customizing.
 
 ## 1. Read the open, unblocked slices
 
@@ -54,4 +54,4 @@ If implementing a slice reveals that the PRD or an accepted ADR is wrong, incomp
 
 ## 6. Hand off
 
-Once the slices in scope for this pass are done, suggest `/groundwork:validate` to check the Definition of Done, or `/groundwork:code-review` to review the diff.
+Once the slices in scope for this pass are done, continue straight into `validate` to check the Definition of Done - it's read-only, so don't ask first unless the user said to stop after building. `validate` itself chains into `code-review` when the gate passes.

@@ -10,7 +10,7 @@ A single focused pass for a greenfield idea, not a multi-day workshop. By the en
 
 ## 0. Preconditions
 
-Read `docs/groundwork/config.json`. If it doesn't exist, tell the user to run `/groundwork:setup` first and stop.
+Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of `${CLAUDE_PLUGIN_ROOT}/skills/setup/SKILL.md`: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. `/groundwork:setup` is only for customizing.
 
 This skill stays in product discovery: vision, personas, scope, goals, non-goals, MVP sequencing. It does not require or produce a stack decision, and it must not invent one. Capture technical constraints only when the user states them as an actual product requirement (e.g. "must work offline", "must integrate with our existing SSO") - record them under Goals or in the Does / Does not table, whichever fits, not as an invented technical section. Choosing an application framework, database, or deployment target is out of scope here. That happens later, in `/groundwork:survey`, and is recorded as ADRs before `/groundwork:to-issues` will proceed.
 
@@ -48,4 +48,4 @@ Do not write acceptance criteria yet unless the user already stated them clearly
 
 ## 6. Hand off
 
-Tell the user what was written and where. If the PRD still has real open questions or unstated assumptions, suggest `/groundwork:survey` to sharpen it. If it's already tight enough to act on, suggest `/groundwork:to-issues`.
+Tell the user what was written and where, then keep the flow moving: if the PRD still has real open questions or unstated assumptions, offer to continue into `survey` to sharpen it; if it's already tight enough to act on, offer `to-issues`. On a yes, read and follow `${CLAUDE_PLUGIN_ROOT}/skills/<name>/SKILL.md` directly in this session - the slash command is never required.

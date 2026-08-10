@@ -12,7 +12,7 @@ This is a periodic, standalone check, not a required stop in the `brainstorm -> 
 
 ## 0. Preconditions
 
-Read `docs/groundwork/config.json`. If it doesn't exist, tell the user to run `/groundwork:setup` first and stop.
+Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of `${CLAUDE_PLUGIN_ROOT}/skills/setup/SKILL.md`: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. `/groundwork:setup` is only for customizing.
 
 ## Glossary
 

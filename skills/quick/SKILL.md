@@ -1,7 +1,6 @@
 ---
 name: quick
-description: Explicit escape hatch - do a trivial task directly, no PRD, ADR, or issues. Optionally logs one line to docs/groundwork/quicklog.md.
-disable-model-invocation: true
+description: Use for trivial tasks in a repo that uses groundwork - a one-file fix, a copy change, a small tweak with no real design space - so they get done directly with no PRD, ADR, or issue ceremony. Optionally logs one line to docs/groundwork/quicklog.md.
 ---
 
 # groundwork:quick

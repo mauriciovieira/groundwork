@@ -1,7 +1,6 @@
 ---
 name: code-review
-description: Review the diff since a fixed point using two parallel sub-agents - a Standards axis and a Spec axis - so neither pollutes the other's context, then merge both reports.
-disable-model-invocation: true
+description: Use when the user asks for a review of the current diff, branch, or recent changes in a repo that uses groundwork. Reviews the diff since a fixed point using two parallel sub-agents - a Standards axis and a Spec axis - so neither pollutes the other's context, then merges both reports.
 argument-hint: "[since-ref]"
 ---
 

@@ -1,7 +1,6 @@
 ---
 name: validate
-description: Lightweight Definition-of-Done gate - check that every acceptance criterion has a passing test, every slice is done or explicitly deferred, and no accepted ADR is violated. Reports pass/fail with specific gaps.
-disable-model-invocation: true
+description: Use when a groundwork feature's implementation looks finished, or the user asks "is it done", "ready to merge", or "does it meet the spec". Definition-of-Done gate - checks every acceptance criterion has a passing test, every slice is done or explicitly deferred, and no accepted ADR is violated. Reports pass/fail with specific gaps.
 argument-hint: "[feature-slug]"
 ---
 
@@ -11,7 +10,7 @@ A gate, not a test-writing skill. Check whether a feature actually meets its own
 
 ## 0. Preconditions
 
-Read `docs/groundwork/config.json`. If it doesn't exist, tell the user to run `/groundwork:setup` first and stop.
+Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of `${CLAUDE_PLUGIN_ROOT}/skills/setup/SKILL.md`: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. `/groundwork:setup` is only for customizing.
 
 ## 1. Check acceptance criteria
 
@@ -27,4 +26,4 @@ For every `Accepted` ADR under the feature's `adr/`, and any relevant `Accepted`
 
 ## 4. Report
 
-Give a pass/fail per acceptance criterion, per slice, and per ADR, not just an overall verdict. For anything that fails, say exactly what's missing and where. If everything passes, say so clearly and suggest `/groundwork:code-review` as the next step before merging.
+Give a pass/fail per acceptance criterion, per slice, and per ADR, not just an overall verdict. For anything that fails, say exactly what's missing and where. If everything passes, say so clearly and continue straight into `code-review` before merging - it's read-only, no need to ask first. If anything failed, stop and report; review waits until the gaps are closed.

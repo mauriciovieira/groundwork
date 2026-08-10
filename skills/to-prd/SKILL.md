@@ -1,7 +1,6 @@
 ---
 name: to-prd
-description: Synthesize the current conversation into prd.md - no interview, just capture what was already discussed. Use when the user has already talked through a plan and doesn't need a survey.
-disable-model-invocation: true
+description: Use when a plan has already been talked through in this conversation and deserves capturing - the user says "write this up", "capture this", "let's document what we agreed", or asks to move forward on a discussed design. Synthesizes the conversation into prd.md with no interview; never invents what wasn't discussed.
 argument-hint: "[feature-slug]"
 ---
 
@@ -11,7 +10,7 @@ Capture, don't interview. The user has already talked through a plan in this con
 
 ## 0. Preconditions
 
-Read `docs/groundwork/config.json`. If it doesn't exist, tell the user to run `/groundwork:setup` first and stop.
+Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of `${CLAUDE_PLUGIN_ROOT}/skills/setup/SKILL.md`: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. `/groundwork:setup` is only for customizing.
 
 Determine the feature slug and number: an argument naming one, an existing feature obviously under discussion, or the next `NNNN-slug` under `docs/groundwork/features/` if this is new. Confirm the slug with the user before writing.
 
@@ -36,4 +35,4 @@ If `prd.md` already exists for this feature, merge rather than overwrite: keep e
 
 ## 3. Report gaps and hand off
 
-Tell the user exactly what got captured and, separately, what's missing or thin. If there are real gaps or unstated assumptions, suggest `/groundwork:survey` to interrogate them rather than pretending the PRD is complete. If it's solid, suggest `/groundwork:to-issues`.
+Tell the user exactly what got captured and, separately, what's missing or thin. If there are real gaps or unstated assumptions, offer to continue into `survey` to interrogate them rather than pretending the PRD is complete. If it's solid, offer `to-issues`. On a yes, read and follow `${CLAUDE_PLUGIN_ROOT}/skills/<name>/SKILL.md` directly in this session - don't wait for a slash command.
