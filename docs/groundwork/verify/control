@@ -1,0 +1,163 @@
+#!/bin/sh
+# Verification CLI for groundwork.
+#
+# groundwork has no runtime: the deliverable is the skills tree, and the thing
+# that can fail is whether an agent that installs it can actually load a skill
+# and follow it. So "launch" is a flat install into a scratch directory, and
+# "drive" is resolving one skill the way an agent would - reading its
+# frontmatter, then following every reference it makes.
+#
+# This is deliberately not what tests/run.sh does. Those check the shape of the
+# repository. This checks the installed artifact behaves.
+set -eu
+
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../../.." && pwd)
+EVIDENCE_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)/evidence"
+INSTALL_DIR="${GROUNDWORK_VERIFY_DIR:-${TMPDIR:-/tmp}/groundwork-verify}"
+
+DRY_RUN=0
+JSON=0
+
+die() {
+  printf 'error: %s\n' "$1" >&2
+  [ $# -gt 1 ] && printf 'expected: %s\n' "$2" >&2
+  [ $# -gt 2 ] && printf 'try: %s\n' "$3" >&2
+  exit 1
+}
+
+usage() {
+  cat <<'USAGE'
+Usage: ./control <command> [options]
+
+Commands:
+  launch            install the skills tree the way a non-Claude agent sees it
+  doctor            check tooling, manifests, and that a launch is present
+  drive <skill>     resolve one installed skill and every reference it makes
+  prove <skill>     drive it and write the evidence to evidence/
+  clean             remove the install
+
+Options:
+  --dry-run   print what would happen, change nothing
+  --json      machine-readable output
+  --help      this text
+
+Run `drive all` to sweep every skill in the order features/README.md defines.
+USAGE
+}
+
+CMD=""; ARG=""
+for a in "$@"; do
+  case "$a" in
+    --dry-run) DRY_RUN=1 ;;
+    --json) JSON=1 ;;
+    -h|--help) usage; exit 0 ;;
+    -*) die "unknown option: $a" "one of --dry-run, --json, --help" "./control --help" ;;
+    *) if [ -z "$CMD" ]; then CMD="$a"; else ARG="$a"; fi ;;
+  esac
+done
+[ -n "$CMD" ] || { usage; exit 2; }
+
+skill_names() { find "$ROOT/skills" -mindepth 1 -maxdepth 1 -type d ! -name '_*' -exec basename {} \; | sort; }
+
+# Resolve one installed skill the way an agent would: read its frontmatter,
+# then follow every path it points at from where it actually sits.
+resolve_skill() {
+  name=$1; dir="$INSTALL_DIR/$name"; problems=""
+
+  [ -e "$dir/SKILL.md" ] || { echo "not installed"; return 1; }
+
+  fm=$(awk '/^---$/{n++; next} n==1{print} n==2{exit}' "$dir/SKILL.md")
+  declared=$(printf '%s' "$fm" | sed -n 's/^name: *//p' | head -1)
+  [ "$declared" = "$name" ] || problems="${problems}frontmatter name is '$declared'; "
+  printf '%s' "$fm" | grep -q '^description: ' || problems="${problems}no description; "
+
+  # Sibling references (../_runtime/, ../_shared/) resolved textually, which is
+  # the hard case: following the symlink would resolve into the source tree and
+  # hide a broken install.
+  for ref in $(grep -o '`\.\./_[A-Za-z0-9_./-]*`' "$dir/SKILL.md" 2>/dev/null | tr -d '`' | sort -u); do
+    target="$INSTALL_DIR/${ref#../}"
+    [ -e "$target" ] || problems="${problems}dangling reference $ref; "
+  done
+
+  # Named skills it hands off to must be installed alongside it.
+  for sib in $(grep -o 'groundwork:[a-z][a-z-]*' "$dir/SKILL.md" 2>/dev/null | sed 's/^groundwork://' | sort -u); do
+    [ -e "$INSTALL_DIR/$sib/SKILL.md" ] || [ -f "$ROOT/agents/$sib.md" ] \
+      || problems="${problems}references groundwork:$sib, which resolves to nothing; "
+  done
+
+  if [ -n "$problems" ]; then printf '%s\n' "$problems"; return 1; fi
+  echo "ok"
+}
+
+case "$CMD" in
+  launch)
+    if [ "$DRY_RUN" -eq 1 ]; then echo "would install $ROOT/skills into $INSTALL_DIR"; exit 0; fi
+    GROUNDWORK_SKILLS_DIR="$INSTALL_DIR" "$ROOT/install.sh" >/dev/null \
+      || die "install.sh failed" "a clean flat install" "GROUNDWORK_SKILLS_DIR=$INSTALL_DIR ./install.sh"
+    count=$(skill_names | wc -l | tr -d ' ')
+    echo "launched: $count skills installed into $INSTALL_DIR"
+    ;;
+
+  doctor)
+    fail=0
+    for tool in jq perl awk git; do
+      command -v "$tool" >/dev/null || { echo "missing tool: $tool" >&2; fail=1; }
+    done
+    for m in .claude-plugin/plugin.json .claude-plugin/marketplace.json .codex-plugin/plugin.json; do
+      jq -e . "$ROOT/$m" >/dev/null 2>&1 || { echo "unparseable manifest: $m" >&2; fail=1; }
+    done
+    vc=$(jq -r '.version' "$ROOT/.claude-plugin/plugin.json" 2>/dev/null || echo x)
+    vx=$(jq -r '.version' "$ROOT/.codex-plugin/plugin.json" 2>/dev/null || echo y)
+    [ "$vc" = "$vx" ] || { echo "manifest versions differ: $vc vs $vx" >&2; fail=1; }
+    [ -d "$INSTALL_DIR" ] || { echo "no install present - run ./control launch first" >&2; fail=1; }
+    [ "$fail" -eq 0 ] || die "environment is not healthy" "tooling, parseable manifests, and a launch" "./control launch"
+    echo "doctor: ok (manifests agree at $vc, install present)"
+    ;;
+
+  drive)
+    [ -n "$ARG" ] || die "drive needs a skill" "./control drive <skill>" "./control drive all"
+    [ -d "$INSTALL_DIR" ] || die "nothing launched" "an install to drive" "./control launch"
+    if [ "$ARG" = all ]; then names=$(skill_names); else names=$ARG; fi
+    bad=0
+    for n in $names; do
+      out=$(resolve_skill "$n") || bad=$((bad + 1))
+      if [ "$JSON" -eq 1 ]; then printf '{"skill":"%s","result":"%s"}\n' "$n" "$out"
+      else printf '  %-32s %s\n' "$n" "$out"; fi
+    done
+    [ "$bad" -eq 0 ] || die "$bad skill(s) did not resolve" "every installed skill to load and resolve its references"
+    echo "drove $(printf '%s\n' $names | wc -l | tr -d ' ') skill(s), all resolved"
+    ;;
+
+  prove)
+    [ -n "$ARG" ] || die "prove needs a skill" "./control prove <skill>" "./control prove all"
+    if [ "$DRY_RUN" -eq 1 ]; then echo "would capture evidence for '$ARG' into $EVIDENCE_DIR"; exit 0; fi
+    mkdir -p "$EVIDENCE_DIR"
+    stamp=$(date -u +%Y%m%dT%H%M%SZ)
+    out="$EVIDENCE_DIR/$ARG-$stamp.txt"
+    {
+      echo "groundwork verification"
+      echo "when:    $stamp"
+      echo "commit:  $(git -C "$ROOT" rev-parse --short HEAD)"
+      echo "install: $INSTALL_DIR"
+      echo
+      "$0" drive "$ARG"
+    } > "$out" 2>&1 || { cat "$out"; die "verification failed for '$ARG'" "every skill to resolve" "see $out"; }
+    echo "proven: $ARG"
+    echo
+    sed 's/^/  /' "$out"
+    echo
+    echo "evidence written to $out - paste the block above into the issue or PR;"
+    echo "the file is scratch and does not survive the worktree."
+    ;;
+
+  clean)
+    if [ "$DRY_RUN" -eq 1 ]; then echo "would remove $INSTALL_DIR"; exit 0; fi
+    if [ -d "$INSTALL_DIR" ]; then
+      GROUNDWORK_SKILLS_DIR="$INSTALL_DIR" "$ROOT/install.sh" --uninstall >/dev/null || true
+      rmdir "$INSTALL_DIR" 2>/dev/null || true
+    fi
+    echo "cleaned"
+    ;;
+
+  *) die "unknown command: $CMD" "one of launch, doctor, drive, prove, clean" "./control --help" ;;
+esac
