@@ -26,4 +26,4 @@ You'll know it's crisp when you can state, in one or two sentences, who has the 
 - **Greenfield** (a new feature or product surface, nothing built yet, needs a vision and an MVP sequence) -> offer `inception`.
 - **Sharpening** (there's already a rough plan or design in mind that needs the assumptions and edge cases interrogated) -> offer `survey`.
 
-Ask which fits rather than assuming, then continue straight into the chosen skill in this same session - read and follow `${CLAUDE_PLUGIN_ROOT}/skills/<name>/SKILL.md`, don't wait for the user to type the slash command. Do not start writing PRDs, ADRs, or code inside *this* skill - that's the next orchestrator's job.
+Ask which fits rather than assuming, then continue straight into the chosen skill in this same session - load and follow the groundwork skill of that name, don't wait for the user to invoke it explicitly. Do not start writing PRDs, ADRs, or code inside *this* skill - that's the next orchestrator's job.

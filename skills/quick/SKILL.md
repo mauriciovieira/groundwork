@@ -21,4 +21,4 @@ After finishing, ask (or just do it, if the user already said they want a trail)
 
 Create the file with a one-line header if it doesn't exist yet. Skip this entirely for genuinely throwaway asks - the log is for a lightweight trail of small work, not a requirement.
 
-Do not create `docs/groundwork/config.json` or any feature directory from this skill. If the user is using `quick` a lot for work that's clearly growing beyond "trivial," say so and point back at `/groundwork:brainstorm` or `/groundwork:to-prd`.
+Do not create `docs/groundwork/config.json` or any feature directory from this skill. If the user is using `quick` a lot for work that's clearly growing beyond "trivial," say so and point back at `brainstorm` or `to-prd`.

@@ -13,10 +13,10 @@ Configure groundwork for this repository. The output is `docs/groundwork/config.
 When any groundwork skill finds no `docs/groundwork/config.json`, it bootstraps one instead of stopping:
 
 1. Detect the tracker: `github` if the repo has a GitHub remote and `gh auth status` succeeds, otherwise `local`. Never assume `linear` - it needs details only the user can give.
-2. Detect implementation status using the same signal heuristics step 2 below describes (strong vs supporting signals), but non-interactively: a strong signal present -> `project_type: "existing"` plus a `detected_stack` of what was actually found; otherwise `"greenfield"`, no stack. Skip step 2's show-and-correct loop - the bootstrap records what it detects and moves on; corrections happen through an explicit `/groundwork:setup` run.
+2. Detect implementation status using the same signal heuristics step 2 below describes (strong vs supporting signals), but non-interactively: a strong signal present -> `project_type: "existing"` plus a `detected_stack` of what was actually found; otherwise `"greenfield"`, no stack. Skip step 2's show-and-correct loop - the bootstrap records what it detects and moves on; corrections happen through an explicit `setup` run.
 3. Take every other default: `docs_dir` `docs/groundwork`, `triage_labels` `[]`, `triage_role_labels` `{}`, `rules_file` `claude`.
 4. Write `config.json` in the shape step 4 defines, and seed `glossary.md` per step 5. Skip the rules file - that's an explicit-setup nicety, not a bootstrap need.
-5. Tell the user in one line what was assumed, and that `/groundwork:setup` changes any of it. Then continue with the original task - don't derail into this interview.
+5. Tell the user in one line what was assumed, and that `setup` changes any of it. Then continue with the original task - don't derail into this interview.
 
 ## 1. Check for an existing config
 
@@ -37,7 +37,7 @@ Inspect the repository for signs of an existing implementation. Weigh signals by
 - **Supporting signals only** (never sufficient alone, but corroborate a strong signal): a Dockerfile, CI config, framework-specific config files with no accompanying source.
 
 - **Existing implementation**: at least one strong signal is present. Record what you actually found - language, framework/runtime, package manager, notable infra config - as plain observed facts. Do not infer or invent anything not visible in the repo, and do not fill gaps with a best guess.
-- **Greenfield**: no strong signal (empty, docs-only, or just scaffolding - even if a Dockerfile or CI config exists, like this plugin's own repo). Record that plainly. No stack exists yet and none should be decided here - choosing one is `/groundwork:survey`'s job, once a feature is being interrogated, not `setup`'s.
+- **Greenfield**: no strong signal (empty, docs-only, or just scaffolding - even if a Dockerfile or CI config exists, like this plugin's own repo). Record that plainly. No stack exists yet and none should be decided here - choosing one is `survey`'s job, once a feature is being interrogated, not `setup`'s.
 
 Show the user what was detected (or that nothing was found) and let them correct it before writing config. Either way, `setup` only records what's true today - it never makes or implies an architectural decision.
 
@@ -54,7 +54,7 @@ Ask about each of these in turn. Do not batch them into a single wall-of-text qu
 
 **Triage labels.** Optional. Only meaningful for `github`/`linear`. A short list of labels `to-issues` applies to every issue it creates (e.g. `groundwork`) - pick something that doesn't collide with whatever label string `triage` ends up using for any of its five state roles (their canonical names by default, or this repo's own mapping if you set one via `triage_role_labels` below), or its issues will be indistinguishable from ones still awaiting triage. Skip for `local`.
 
-**Triage role labels.** Optional, and a separate thing from the list above - only ask if the user says they'll use `/groundwork:triage`, and only meaningful for `github`/`linear` (skip for `local`, same as the config above). `triage` moves an issue through five canonical *state* roles (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`) and needs to know the actual label string for each one - `triage_role_labels` covers only these five; the `bug`/`enhancement` *category* roles are fixed and not configurable here. Default: each state role's label equals its name. Ask if any should map to a different existing label in this repo's tracker (e.g. role `needs-triage` -> label `bug:triage`); only record the ones that differ.
+**Triage role labels.** Optional, and a separate thing from the list above - only ask if the user says they'll use `triage`, and only meaningful for `github`/`linear` (skip for `local`, same as the config above). `triage` moves an issue through five canonical *state* roles (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`) and needs to know the actual label string for each one - `triage_role_labels` covers only these five; the `bug`/`enhancement` *category* roles are fixed and not configurable here. Default: each state role's label equals its name. Ask if any should map to a different existing label in this repo's tracker (e.g. role `needs-triage` -> label `bug:triage`); only record the ones that differ.
 
 **Rules file.** Where repo-level rules live:
 - `claude` (default): groundwork writes `CLAUDE.md` at the repo root. Right choice for a Claude-only repo.
@@ -86,11 +86,11 @@ Full shape of the file:
 
 Adjust fields to what was chosen. For `tracker: "github"`, you may add a `"github": {"repo": "owner/name"}` block detected from the remote. For `tracker: "linear"`, add `"linear": {"team": "..."}` if the user gave one. `triage_role_labels` only needs entries for roles whose label differs from its own name - leave it `{}` if none do. Never write secrets into this file.
 
-Set `project_type` to `"existing"` or `"greenfield"` per step 2. Only include `detected_stack` for `"existing"` - populate it with what was actually found, nothing invented. For `"greenfield"`, omit `detected_stack` entirely (or leave it `null`); the stack gets decided later, in `/groundwork:survey`, and recorded as ADRs, not here.
+Set `project_type` to `"existing"` or `"greenfield"` per step 2. Only include `detected_stack` for `"existing"` - populate it with what was actually found, nothing invented. For `"greenfield"`, omit `detected_stack` entirely (or leave it `null`); the stack gets decided later, in `survey`, and recorded as ADRs, not here.
 
 ## 5. Seed the docs
 
-If it doesn't already exist, create `docs/groundwork/glossary.md` from `${CLAUDE_SKILL_DIR}/templates/glossary.md`.
+If it doesn't already exist, create `docs/groundwork/glossary.md` from the `templates/glossary.md` file bundled with this skill.
 
 Leave it mostly empty; other skills fill it in as work happens. Do not translate or rewrite the template headers - later skills add content in whatever language the conversation is in, not a language baked in here.
 
@@ -102,9 +102,9 @@ Leave it mostly empty; other skills fill it in as work happens. Do not translate
 ## 7. Confirm and hand off
 
 Tell the user what was created. Suggest a next step based on where they are:
-- Have an idea but no plan yet -> `/groundwork:brainstorm`
-- Already talked through a plan in this conversation -> `/groundwork:to-prd`
-- Have inbound issues already sitting in the tracker -> `/groundwork:triage`
+- Have an idea but no plan yet -> `brainstorm`
+- Already talked through a plan in this conversation -> `to-prd`
+- Have inbound issues already sitting in the tracker -> `triage`
 - Just want setup done for now -> stop here.
 
 Never re-run this interview automatically. When another groundwork skill can't find `docs/groundwork/config.json`, it follows the Lazy bootstrap above rather than running this interview or asking the same questions inline.
