@@ -53,21 +53,76 @@ Three more skills back the orchestrators above but aren't meant to be invoked di
 
 ## The flow
 
-```
-brainstorm ──┬──> inception ──┐
-             └──> survey <────┴──> to-prd
-                    │
-triage ─────────────┘
-                    │
-                    v
-                to-issues ──> build ──> validate ──> code-review
-                                 │           ^
-                                 └> verify ──┘
+```mermaid
+flowchart LR
+    BR[brainstorm] --> IN[inception]
+    BR --> SU[survey]
+    IN --> SU
+    TP[to-prd] --> SU
+    IN --> TI[to-issues]
+    TP --> TI
+    SU --> TI
+    TR[triage] --> TI
+    TR -. "already specified,<br/>no PRD needed" .-> BU[build]
+    TI --> BU
+    BU --> VA[validate]
+    VA --> CR[code-review]
 ```
 
-Since 1.0 the arrows are real hand-offs: an orchestrator offers the next step inline and continues on a yes - and `build` flows into `validate` and `code-review` automatically, since those are read-only. You type the next command only when you want to steer.
+The arrows are real hand-offs: an orchestrator offers the next step inline and continues on a
+yes, and `build` flows into `validate` and `code-review` on its own since those write nothing.
+You type the next command only when you want to steer.
 
-`quick` sits outside this flow entirely, for anything too small to justify it. `improve-codebase-architecture` also sits outside it - a periodic check you run whenever the codebase feels like it's accumulating friction, not a required stop for any one feature. `triage` feeds `to-issues` when an issue needs a PRD-level slice, but can also skip straight to an agent brief when the issue is already fully specified - `build` reads those directly off the tracker alongside `to-issues` slices, in whatever format each carries its `Type` field.
+### The proof loop
+
+What separates this from a flow that ends at "the tests pass":
+
+```mermaid
+flowchart LR
+    G([tests go green]) --> VE{verify}
+    VE -->|proven| D([slice closes])
+    VE -. "disproven, or the<br/>app would not run" .-> NP([needs-proof:<br/>issue stays open])
+    NP -. "next pass proves it<br/>instead of rebuilding" .-> VE
+    D --> VA{validate}
+    VA -->|"every criterion<br/>covered and proven"| CR([code-review])
+    VA -. "gap list handed back" .-> G
+```
+
+`verify --init` is what makes any of this possible, and it runs once per repository.
+
+**`build` proves each slice before closing it.** After the TDD cycle goes green, it runs
+`verify` against the feature-map entry the slice names in its `Verifies` field and posts the
+evidence to the slice itself. A slice whose tests pass but whose verification did not becomes
+`needs-proof` rather than done - the issue stays open on `github` and `linear`, since closing
+is the only "done" signal those trackers have, and takes a `Status: needs-proof` value on
+`local`. The next pass picks it back up and goes straight to proving it rather than rebuilding
+work that already exists.
+
+**`validate` fails backwards instead of stopping.** It reports each acceptance criterion as
+`covered+proven`, `covered-unproven`, `uncovered`, or `failing`, and on a failure it hands
+`build` the specific list of what would close each gap rather than leaving you to reconstruct
+it. `covered-unproven` is not a pass: a test agreeing with the code is not the same as the
+product being watched doing the thing.
+
+**A repository with no verification does not pass the gate.** `build` will still build there -
+building unproven work is allowed - but `validate` refuses to certify a feature nothing can
+demonstrate, and points at `verify --init`. That is the easiest failure to wave through and the
+one most likely to stand for years, so the gate is deliberately the only place it gets caught.
+
+### Outside the flow
+
+| Skill | When |
+| --- | --- |
+| `quick` | anything too small to justify the ceremony |
+| `why` | why is this the way it is - reads the ADRs first |
+| `how` | how does this work - reads the feature map first |
+| `recall` | where did we leave off - reads only, writes nothing |
+| `improve-codebase-architecture` | a periodic architecture review, not a per-feature stop |
+| `verify --sync` | reconcile the feature map, which `build` already triggers at the end of a pass |
+
+`triage` feeds `to-issues` when an issue needs a PRD-level slice, but can skip straight to an
+agent brief when the issue is already fully specified - `build` reads those off the tracker
+alongside `to-issues` slices, in whatever format each carries its `Type` field.
 
 ## PRD, ADR, issues - not spec and plan
 
