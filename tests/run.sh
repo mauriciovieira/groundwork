@@ -179,4 +179,48 @@ for dir in $(skill_dirs); do
   fi
 done
 
+# --------------------------------------------------------------------- verify
+
+group "Verification templates"
+
+for f in verify-README.md features-README.md feature.md control; do
+  if [ -f "skills/verify/templates/$f" ]; then
+    pass "verify ships a $f template"
+  else
+    fail "verify is missing its $f template"
+  fi
+done
+
+if [ -x skills/verify/templates/control ]; then
+  pass "the control template is executable"
+else
+  fail "the control template is not executable - the copy would lose the bit"
+fi
+
+if sh -n skills/verify/templates/control 2>/dev/null; then
+  pass "the control template parses as sh"
+else
+  fail "the control template does not parse"
+fi
+
+# The skeleton is useless if a subcommand named in SKILL.md has no branch in it.
+for cmd in launch doctor drive prove clean; do
+  if grep -q "^  $cmd)" skills/verify/templates/control; then
+    pass "control handles $cmd"
+  else
+    fail "control has no branch for $cmd, which SKILL.md requires"
+  fi
+done
+
+# An unimplemented subcommand must fail loudly. A branch that falls through and
+# exits 0 reports success for work nobody did - the exact failure this skill
+# exists to prevent, shipped inside its own template.
+for cmd in launch doctor drive prove; do
+  if awk "/^  $cmd\\)/,/^    ;;/" skills/verify/templates/control | grep -q 'die '; then
+    pass "control's $cmd branch fails loudly until implemented"
+  else
+    fail "control's $cmd branch can exit 0 without doing anything"
+  fi
+done
+
 report

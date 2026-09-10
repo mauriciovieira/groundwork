@@ -86,6 +86,14 @@ Full shape of the file:
 
 Adjust fields to what was chosen. For `tracker: "github"`, you may add a `"github": {"repo": "owner/name"}` block detected from the remote. For `tracker: "linear"`, add `"linear": {"team": "..."}` if the user gave one. `triage_role_labels` only needs entries for roles whose label differs from its own name - leave it `{}` if none do. Never write secrets into this file.
 
+One more optional block, `verify`, records where this repository's verification CLI and its evidence directory live, with both paths relative to `docs_dir`:
+
+```json
+"verify": { "cli": "verify/control", "evidence_dir": "verify/evidence" }
+```
+
+Do not write it here. The `verify` skill writes it when `verify --init` builds the CLI, because the paths are only true once that exists. Its absence is the signal that this repository has no verification yet: `build` and `validate` say so once and carry on rather than blocking.
+
 Set `project_type` to `"existing"` or `"greenfield"` per step 2. Only include `detected_stack` for `"existing"` - populate it with what was actually found, nothing invented. For `"greenfield"`, omit `detected_stack` entirely (or leave it `null`); the stack gets decided later, in `survey`, and recorded as ADRs, not here.
 
 ## 5. Seed the docs
