@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # tests/run.sh reads the tracked file list from git, so it needs a real
+      # checkout rather than an export. jq and perl are both preinstalled on
+      # ubuntu-latest; fail loudly rather than skip if that stops being true.
+      - name: Check tooling
+        run: |
+          command -v jq >/dev/null || { echo "jq is required"; exit 1; }
+          command -v perl >/dev/null || { echo "perl is required"; exit 1; }
+
+      - name: Structural tests
+        run: ./tests/run.sh
+
+      - name: Installer is idempotent and non-destructive
+        run: |
+          set -eu
+          export GROUNDWORK_SKILLS_DIR="$RUNNER_TEMP/agents-skills"
+
+          ./install.sh --dry-run > "$RUNNER_TEMP/first"
+          ./install.sh --dry-run > "$RUNNER_TEMP/second"
+          diff "$RUNNER_TEMP/first" "$RUNNER_TEMP/second"
+
+          ./install.sh > /dev/null
+          test -L "$GROUNDWORK_SKILLS_DIR/survey"
+
+          # A second install must not duplicate or clobber anything.
+          ./install.sh | grep -q 'linked 0 skill'
+
+          # A name already taken by something else is left alone.
+          mkdir -p "$GROUNDWORK_SKILLS_DIR/mine"
+          touch "$GROUNDWORK_SKILLS_DIR/mine/SKILL.md"
+          ./install.sh > /dev/null
+          test -f "$GROUNDWORK_SKILLS_DIR/mine/SKILL.md"
+
+          # Uninstall removes only our own links.
+          ./install.sh --uninstall > /dev/null
+          test ! -e "$GROUNDWORK_SKILLS_DIR/survey"
+          test -f "$GROUNDWORK_SKILLS_DIR/mine/SKILL.md"
