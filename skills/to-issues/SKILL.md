@@ -42,16 +42,18 @@ For every slice, work out:
 - **Type**: `HITL` (needs a human decision or review mid-flight - touches something irreversible, ambiguous, or outside what the PRD/ADRs already decided) or `AFK` (mergeable without a human in the loop, because the PRD and ADRs already say enough to build and verify it alone). **Prefer AFK.** Only mark `HITL` when there's a concrete reason a human has to be involved, not by default caution.
 - **Blocked-by**: which other slices must land first, if any.
 - **Covers**: which user stories or acceptance criteria from the PRD this slice satisfies.
+- **Finish-condition**: the testable outcome that means this slice is done. State a result, never a duration or an amount of effort - "every caller of the old helper is gone", "the fixture round-trips", not "about half a day". If you cannot state one, the slice is not cut sharply enough yet; go back and cut it again.
+- **Verifies**: which feature-map entry under `<docs_dir>/verify/features/` this slice touches, so `build` knows what to drive when it finishes. Write `none` for a slice with no user-visible behaviour (a build script, a dependency bump), and `new: <slug>` when the slice creates a feature the map does not have yet. Skip this field entirely if the repository has no `verify` block in its config.
 
 ## 5. Present and quiz
 
-Show the user the full breakdown as a numbered list (Title, Type, Blocked-by, Covers) before creating anything. Then ask about granularity ("is any of these too big, too small, or wrong to cut here?") and about the dependency graph ("did I get the blocking order right?"). Iterate on the list until the user approves it - don't create issues from a list they haven't confirmed.
+Show the user the full breakdown as a numbered list (Title, Type, Blocked-by, Covers, Finish-condition, Verifies) before creating anything. Then ask about granularity ("is any of these too big, too small, or wrong to cut here?"), about the dependency graph ("did I get the blocking order right?"), and about the finish conditions ("would each of these be unarguable when it lands?"). Iterate on the list until the user approves it - don't create issues from a list they haven't confirmed.
 
 ## 6. Create the items
 
 Once approved, create the items in dependency order (blockers before what they block), in the tracker named by `config.json`'s `tracker` field. The slicing, tagging, and quiz above are identical regardless of destination - only this step differs:
 
-- **`github`**: create each with `gh issue create --title "..." --body "..."`, applying any `triage_labels` from config. Put Type, Blocked-by (as `Blocked by #<number>`, filled in once the blocking issue exists), and Covers in the issue body. Cross-reference by issue number.
+- **`github`**: create each with `gh issue create --title "..." --body "..."`, applying any `triage_labels` from config. Put Type, Blocked-by (as `Blocked by #<number>`, filled in once the blocking issue exists), Covers, Finish-condition, and Verifies in the issue body. Cross-reference by issue number.
 - **`linear`**: use the Linear MCP tools if connected (check via a tool search if unsure what's available); otherwise tell the user what's missing rather than guessing at an API call. Set the same fields; if the tracker doesn't support a native blocking relation through the tools available, put `Blocked by <identifier>` in the description instead.
 - **`local`**: append each slice to `docs/groundwork/features/NNNN-slug/tasks.md` as:
 
@@ -61,6 +63,8 @@ Once approved, create the items in dependency order (blockers before what they b
   - Type: AFK
   - Blocked-by: none
   - Covers: <acceptance criteria / user stories referenced>
+  - Finish-condition: <the testable outcome that means this is done>
+  - Verifies: <feature-map slug, `none`, or `new: <slug>`>
   - Status: open
   ```
 

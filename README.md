@@ -40,6 +40,7 @@ The result: you can still drive everything with explicit commands, but a plain "
 | `/groundwork:triage` | Sorts inbound issues through five state roles (`needs-triage`/`needs-info`/`ready-for-agent`/`ready-for-human`/`wontfix` - configurable label strings per role) before they reach `to-issues`, or straight into an agent brief when no PRD is needed. |
 | `/groundwork:to-issues` | Breaks `prd.md` + `adr/` into tracer-bullet vertical slices (HITL/AFK, dependency-ordered) and creates them in your tracker. |
 | `/groundwork:build` | Implements the open, unblocked slices with TDD. Sequential by default; `--worktree` and `--parallel` are opt-in. |
+| `/groundwork:verify` | Proves a feature works by driving the running app and capturing evidence. Builds the project's verification CLI and feature map on first use (`--init`). |
 | `/groundwork:validate` | Definition-of-Done gate: every acceptance criterion tested, every slice done or deferred, no ADR (Architecture Decision Record) violated. |
 | `/groundwork:code-review` | Reviews the diff along a Standards axis and a Spec axis, in parallel, then merges both reports. |
 | `/groundwork:quick` | The escape hatch: does a trivial task directly, no PRD/ADR/issues. |
@@ -57,6 +58,8 @@ triage ─────────────┘
                     │
                     v
                 to-issues ──> build ──> validate ──> code-review
+                                 │           ^
+                                 └> verify ──┘
 ```
 
 Since 1.0 the arrows are real hand-offs: an orchestrator offers the next step inline and continues on a yes - and `build` flows into `validate` and `code-review` automatically, since those are read-only. You type the next command only when you want to steer.
@@ -89,6 +92,30 @@ docs/groundwork/
       map.md              # only when survey escalated to map speed and tracker = local
       tickets.md          # only when survey escalated to map speed and tracker = local
 ```
+
+## Proof, not just a green test
+
+A passing test is the agent grading its own homework. `verify` closes that gap: it drives the
+running application the way a user would and captures evidence of the outcome, so a slice is
+shown working rather than asserted working.
+
+`verify --init` builds two things inside the repository, under `docs_dir`, so a person at a
+terminal and any agent run the same thing:
+
+- **`verify/control`** - the project's own CLI, in whatever language the project already uses,
+  with `launch`, `doctor`, `drive`, `prove` and `clean`. Prose telling an agent how to run your
+  app gets re-read and re-interpreted every session; a command does not.
+- **`verify/features/`** - one file per user-visible feature, each answering the same four
+  questions: what exists today, how a person gets there, how an agent drives it, and the known
+  failure modes. The glossary names the domain; the feature map says what the product does and
+  how to watch it do it.
+
+`build` runs a verification before closing a slice, and `validate` requires observable proof
+per acceptance criterion rather than a passing test alone. Evidence is posted to the tracker,
+not left as a path into a gitignored scratch directory that vanishes with the worktree.
+
+Repositories with no `verify` block in their config simply skip this: `build` and `validate`
+say so once and carry on.
 
 ## Two speeds of survey
 

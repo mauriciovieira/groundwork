@@ -1,0 +1,81 @@
+#!/bin/sh
+# Verification CLI for this project.
+#
+# A starting skeleton: replace every marked section with what this project
+# actually needs, and rewrite it in the project's own language if that suits it
+# better. What matters is the contract, not the shell.
+#
+# Contract:
+#   - launch / doctor / drive / prove / clean all exist
+#   - anything destructive takes --dry-run and prints what it would do
+#   - every subcommand supports --json
+#   - errors say what failed, what was expected, and what to try next
+set -eu
+
+DRY_RUN=0
+JSON=0
+EVIDENCE_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)/evidence"
+
+die() { printf 'error: %s\n' "$1" >&2; [ $# -gt 1 ] && printf 'expected: %s\n' "$2" >&2; exit 1; }
+
+usage() {
+  cat <<'USAGE'
+Usage: ./control <command> [options]
+
+Commands:
+  launch            start the app ready to be driven
+  doctor            check preconditions, report what is wrong
+  drive <feature>   exercise a feature the way a user would
+  prove <feature>   capture evidence of the outcome
+  clean             undo launch
+
+Options:
+  --dry-run   print what would happen, change nothing
+  --json      machine-readable output
+  --help      this text
+USAGE
+}
+
+CMD=""
+ARG=""
+for a in "$@"; do
+  case "$a" in
+    --dry-run) DRY_RUN=1 ;;
+    --json) JSON=1 ;;
+    -h|--help) usage; exit 0 ;;
+    -*) die "unknown option: $a" "one of --dry-run, --json, --help" ;;
+    *) if [ -z "$CMD" ]; then CMD="$a"; else ARG="$a"; fi ;;
+  esac
+done
+[ -n "$CMD" ] || { usage; exit 2; }
+
+case "$CMD" in
+  launch)
+    # TODO: start the app and return only once it is ready to drive.
+    die "launch is not implemented yet" "a command that starts this app"
+    ;;
+  doctor)
+    # TODO: check services, migrations, seed data, credentials, ports.
+    # Report problems; never fix them silently.
+    die "doctor is not implemented yet" "checks for this project's preconditions"
+    ;;
+  drive)
+    [ -n "$ARG" ] || die "drive needs a feature" "./control drive <feature>"
+    # TODO: exercise the feature named in features/<slug>.md.
+    die "drive is not implemented yet" "steps for feature '$ARG'"
+    ;;
+  prove)
+    [ -n "$ARG" ] || die "prove needs a feature" "./control prove <feature>"
+    mkdir -p "$EVIDENCE_DIR"
+    # TODO: capture the observable outcome into $EVIDENCE_DIR, then print a
+    # short summary small enough to paste into an issue or PR. The file itself
+    # is scratch; the pasted artifact is the proof of record.
+    die "prove is not implemented yet" "evidence capture for feature '$ARG'"
+    ;;
+  clean)
+    [ "$DRY_RUN" -eq 1 ] && { echo "would stop the app and remove local state"; exit 0; }
+    # TODO: undo launch.
+    die "clean is not implemented yet" "the inverse of launch"
+    ;;
+  *) die "unknown command: $CMD" "one of launch, doctor, drive, prove, clean" ;;
+esac
