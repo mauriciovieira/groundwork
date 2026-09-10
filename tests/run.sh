@@ -68,6 +68,17 @@ done
 group "References resolve"
 
 # Every backticked path into skills/ must exist on disk.
+# Relative sibling references (../_runtime/, ../_shared/) resolve against the
+# directory of the file citing them, which is what makes them work both inside
+# a plugin tree and in a flat ~/.agents/skills install.
+check_empty "every ../ sibling reference resolves from its own file" \
+  "$(grep -rno '`\.\./_[A-Za-z0-9_./-]*`' skills 2>/dev/null \
+     | while IFS=: read -r file _ ref; do
+         ref=$(printf '%s' "$ref" | tr -d '`')
+         dir=$(dirname "$file")
+         [ -e "$dir/$ref" ] || echo "missing: $ref (cited by $file)"
+       done || true)"
+
 check_empty "every referenced skills/ path exists" \
   "$(grep -rho '`skills/[A-Za-z0-9_./-]*`' skills agents README.md 2>/dev/null \
      | tr -d '`' | sort -u \
@@ -298,6 +309,84 @@ if grep -q 'groundwork:verify' agents/slice-builder.md; then
   pass "slice-builder proves its own slice"
 else
   fail "slice-builder can report success on tests alone"
+fi
+
+# --------------------------------------------------------------- cross-judging
+
+group "Nothing grades its own homework"
+
+for f in skills/_shared/COMPETING-DESIGNS.md agents/design-judge.md agents/review-judge.md; do
+  if [ -f "$f" ]; then
+    pass "$f exists"
+  else
+    fail "$f is missing"
+  fi
+done
+
+# Criteria fixed after seeing candidates rationalise a preference already formed.
+if grep -q 'before you see any candidate' skills/_shared/COMPETING-DESIGNS.md; then
+  pass "criteria are fixed before any candidate exists"
+else
+  fail "nothing stops criteria being written after the candidates"
+fi
+
+# A judge told who wrote what is not blind. Anchor on a phrase that markdown
+# emphasis cannot break up - the first version matched 'not be told' and missed
+# the actual text, which reads '**not** be told'.
+if grep -q 'who produced which' agents/design-judge.md; then
+  pass "design-judge is kept blind to authorship"
+else
+  fail "design-judge could be told which worker wrote which candidate"
+fi
+
+# Both judges must be allowed to decline to pick a winner.
+if grep -q 'tie is a real answer' agents/design-judge.md; then
+  pass "design-judge may report a tie"
+else
+  fail "design-judge is forced to invent a winner"
+fi
+
+if grep -q 'unresolvable at this level' agents/review-judge.md; then
+  pass "review-judge may report an unresolvable conflict"
+else
+  fail "review-judge is forced to pick a side"
+fi
+
+# The arbiter must be exceptional, not a routine pass over every finding.
+if grep -q 'skip step 4 entirely' skills/code-review/SKILL.md; then
+  pass "code-review skips arbitration when nothing contradicts"
+else
+  fail "code-review would arbitrate on every run"
+fi
+
+if grep -q 'not a conflict' skills/code-review/SKILL.md; then
+  pass "code-review defines what is not a conflict"
+else
+  fail "code-review does not say what fails to count as a contradiction"
+fi
+
+# survey has to be able to reach the pattern, or it is dead prose.
+if grep -q 'COMPETING-DESIGNS' skills/survey/SKILL.md; then
+  pass "survey can reach the competing-designs pattern"
+else
+  fail "nothing routes survey into competing designs"
+fi
+
+# Judges are read-only: a judge that can edit is a participant.
+for a in design-judge review-judge; do
+  if awk '/^---$/{n++; next} n==1{print}' "agents/$a.md" | grep -q 'disallowedTools: Write, Edit'; then
+    pass "$a cannot write"
+  else
+    fail "$a can edit the work it judges"
+  fi
+done
+
+# The shared reference dirs are not skills, but the installer must still link
+# them or ../_runtime/ and ../_shared/ resolve to nothing on a flat install.
+if grep -q 'is_shared' install.sh; then
+  pass "install.sh links the shared reference directories"
+else
+  fail "install.sh skips _ directories, breaking every ../ reference"
 fi
 
 report
