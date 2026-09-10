@@ -227,4 +227,77 @@ for cmd in launch doctor drive prove clean; do
   fi
 done
 
+# ------------------------------------------------------------------- the loop
+
+group "The verification loop is wired"
+
+# to-issues has to emit the two fields build reads, or build has nothing to act on.
+for field in "Finish-condition" "Verifies"; do
+  if grep -q "$field" skills/to-issues/SKILL.md; then
+    pass "to-issues defines $field"
+  else
+    fail "to-issues does not define $field, which build reads"
+  fi
+done
+
+for field in "Finish-condition" "Verifies"; do
+  if grep -q "$field" skills/build/SKILL.md; then
+    pass "build reads $field"
+  else
+    fail "build ignores $field, which to-issues writes"
+  fi
+done
+
+# An unproven slice needs a representation in every tracker, or the loop leaks
+# on whichever one was forgotten.
+if grep -q 'needs-proof' skills/build/SKILL.md; then
+  pass "build has a state for a built-but-unproven slice"
+else
+  fail "build closes or abandons unproven slices with no third state"
+fi
+
+if grep -q 'needs-proof' skills/validate/SKILL.md; then
+  pass "validate reports needs-proof slices"
+else
+  fail "validate cannot see a needs-proof slice"
+fi
+
+# For local, needs-proof must still be pickable, or the slice is stranded.
+if grep -q 'Status: open` or `Status: needs-proof' skills/build/SKILL.md; then
+  pass "build picks needs-proof slices back up on the local tracker"
+else
+  fail "a local needs-proof slice would never be picked up again"
+fi
+
+# The four outcomes are the point: covered-unproven must not read as a pass.
+for outcome in 'covered+proven' 'covered-unproven' 'uncovered' 'failing'; do
+  if grep -q -- "$outcome" skills/validate/SKILL.md; then
+    pass "validate distinguishes $outcome"
+  else
+    fail "validate has no $outcome outcome"
+  fi
+done
+
+# A PRD from inception leaves criteria as a placeholder; passing that is worse
+# than failing it, because an empty gate reads as done.
+if grep -q 'placeholder' skills/validate/SKILL.md; then
+  pass "validate refuses a PRD whose criteria are still a placeholder"
+else
+  fail "validate would pass a PRD with no acceptance criteria"
+fi
+
+# The gate has to hand work back, or a failure is a dead end.
+if grep -q 'back into `build`' skills/validate/SKILL.md; then
+  pass "validate hands a gap list back to build"
+else
+  fail "validate stops on failure with no way back into build"
+fi
+
+# The parallel worker must carry the same contract as the sequential path.
+if grep -q 'groundwork:verify' agents/slice-builder.md; then
+  pass "slice-builder proves its own slice"
+else
+  fail "slice-builder can report success on tests alone"
+fi
+
 report

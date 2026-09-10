@@ -12,18 +12,45 @@ A gate, not a test-writing skill. Check whether a feature actually meets its own
 
 Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of the groundwork `setup` skill: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. Running `setup` explicitly is only for customizing.
 
-## 1. Check acceptance criteria
+## 1. Check the PRD actually states criteria
 
-For every acceptance criterion in `docs/groundwork/features/NNNN-slug/prd.md`, find whether a test actually exercises it. Run the test suite; don't take a test's existence on faith if you can execute it. Report each criterion as covered, uncovered, or covered-but-failing.
+Open `docs/groundwork/features/NNNN-slug/prd.md` and find its acceptance criteria. A PRD written by `inception` deliberately leaves that section as a placeholder for `survey` to fill in.
 
-## 2. Check slice status
+If the section is missing, empty, or still a placeholder, **stop here and say so**. A feature with no stated criteria cannot pass this gate, and reporting a pass over an empty list is the worst outcome available: it reads as done. Send the user to `survey` to state the criteria, and do not continue to step 2.
 
-Read the slices from the configured tracker (open/closed issues, or `tasks.md` statuses). Every slice from `to-issues` should be `done` or explicitly `deferred` with a stated reason. Flag any slice that's neither - stuck open with no explanation, or silently abandoned.
+## 2. Check acceptance criteria
 
-## 3. Check ADR compliance
+For every acceptance criterion, ask two separate questions.
+
+**Is it tested?** Find whether a test actually exercises it. Run the test suite; don't take a test's existence on faith if you can execute it.
+
+**Is it proven?** If the config has a `verify` block, check that the criterion has observable evidence behind it - a verification that drove the running application and captured what happened, posted to the slice that covers this criterion. A passing test is the code agreeing with itself; evidence is the product being watched doing the thing.
+
+Report each criterion as exactly one of:
+
+- **`covered+proven`** - a passing test and posted evidence
+- **`covered-unproven`** - a passing test, no evidence. Not a pass
+- **`uncovered`** - no test exercises it
+- **`failing`** - a test exercises it and does not pass
+
+Where the repository has no `verify` block, say once that proof was not available and report `covered` rather than `covered+proven`, so nobody later reads an unproven feature as a proven one.
+
+## 3. Check slice status
+
+Read the slices from the configured tracker (open/closed issues, or `tasks.md` statuses). Every slice from `to-issues` should be `done` or explicitly `deferred` with a stated reason. Flag any slice that's neither - stuck open with no explanation, or silently abandoned. A slice marked `needs-proof` is its own outcome: built, but never shown working. Report those separately from open slices, because the fix is different - they need a verification run, not implementation.
+
+Check each slice's `Finish-condition` against reality too. A closed slice whose finish condition is not actually met was closed early.
+
+## 4. Check ADR compliance
 
 For every `Accepted` ADR under the feature's `adr/`, and any relevant `Accepted` ADR under the system-wide `docs/groundwork/adr/` (written by `improve-codebase-architecture`, or by `survey` for implementation-stack decisions), do a best-effort check that the current code doesn't contradict its Decision. This can't be exhaustive - look for obvious violations (an ADR mandates one approach and the code visibly does something else), not subtle ones. Say plainly when you can't verify something rather than asserting compliance you didn't check.
 
-## 4. Report
+## 5. Report, and close the loop
 
-Give a pass/fail per acceptance criterion, per slice, and per ADR, not just an overall verdict. For anything that fails, say exactly what's missing and where. If everything passes, say so clearly and continue straight into `code-review` before merging - it's read-only, no need to ask first. If anything failed, stop and report; review waits until the gaps are closed.
+Give a verdict per acceptance criterion, per slice, and per ADR, not just an overall one. For anything that fails, say exactly what's missing and where.
+
+**If everything passes**, say so clearly and continue straight into `code-review` before merging.
+
+**If anything failed**, don't just stop. Say what would close each gap, and offer to go back into `build` with that exact list - uncovered criteria need tests, `covered-unproven` ones need a verification run, `needs-proof` slices need evidence, and a failing test needs a fix. Hand the list over rather than making the user reconstruct it. Review waits until the gaps are closed.
+
+Never report an overall pass because most things passed. This gate exists to be the one place that says no.

@@ -13,13 +13,15 @@ Implement the slices `to-issues` created - or, for issues `triage` marked `ready
 
 Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of the groundwork `setup` skill: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. Running `setup` explicitly is only for customizing.
 
+Note whether the config has a `verify` block. If it does, every slice has to be proven before it closes (step 2 below). If it doesn't, say once that this repository has no verification set up and that slices will close on tests alone, mention `verify --init` as the way to change that, and carry on. Never block a build over it.
+
 ## 1. Read the open, unblocked slices
 
 Pull from the configured tracker:
 
 - `github`: `gh issue list`, filtered to open issues not marked `Blocked by` an issue that's still open.
 - `linear`: query via the Linear MCP tools for open issues in this feature whose blockers are resolved.
-- `local`: parse `docs/groundwork/features/NNNN-slug/tasks.md` for slices with `Status: open` whose `Blocked-by` slices are already `Status: done`.
+- `local`: parse `docs/groundwork/features/NNNN-slug/tasks.md` for slices with `Status: open` or `Status: needs-proof` whose `Blocked-by` slices are already `Status: done`. A `needs-proof` slice is built work waiting only on evidence, so pick it up again and go straight to proving it rather than rebuilding it.
 
 If this repo also uses `triage`, the tracker will contain raw inbound issues too - ones still sitting in `needs-triage`, `needs-info`, or otherwise not yet through the triage state machine, and possibly carrying an unrelated "Type:" field of their own (many issue templates have one, e.g. "Type: bug"). Skip anything whose `Type` field isn't exactly `AFK` or `HITL` (in whichever format applies, see below) - that's the actual signal a slice or Agent Brief exists, not just the presence of some field named `Type`. Don't attempt to build it.
 
@@ -31,10 +33,15 @@ An open issue is workable whether it came from `to-issues` (a `Type` field value
 
 For each unblocked slice, in order:
 
-1. Read the slice's acceptance criteria - from `prd.md` if it's a `to-issues` slice, or from its own Agent Brief comment if `triage` created it directly - and the relevant ADR sections.
+1. Read the slice's acceptance criteria - from `prd.md` if it's a `to-issues` slice, or from its own Agent Brief comment if `triage` created it directly - and the relevant ADR sections. Read its `Finish-condition` too: that is what "done" means for this slice, and it is what step 4 is checked against.
 2. Use the `groundwork:tdd` technique to implement it: a failing test per acceptance criterion first, minimal code to pass, then refactor.
-3. Mark the slice done in the tracker (close the issue, or set `Status: done` in `tasks.md`) once its tests pass.
-4. Move to the next unblocked slice.
+3. **Prove it, if this repository has verification.** Run the `groundwork:verify` skill against the feature named in the slice's `Verifies` field. Post the evidence to the slice itself - pasted into the issue comment, or into the PR body when the slice became a PR - because a path into the gitignored `evidence/` directory means nothing to the next session. A slice whose `Verifies` field is `none` skips this; a slice whose field says `new: <slug>` needs its feature-map entry written first.
+4. **Close it, or mark it unproven.** A slice closes when its tests pass, its finish condition is met, and its evidence is posted. If the tests pass but the verification did not - disproven, or the app would not run - do not close it. Record it as needing proof and move on to the next slice rather than stopping the whole build:
+   - `github` and `linear`: leave the issue **open** and comment `Status: needs-proof` with what is missing. Closing is the only "done" signal these trackers have, so an unproven slice must not be closed.
+   - `local`: set `Status: needs-proof` in `tasks.md`, alongside the existing `open` and `done`.
+5. Move to the next unblocked slice.
+
+At the end of the pass, report the slices that closed and, separately, the ones left needing proof. Never fold the two together into a count of slices "done".
 
 This runs entirely in the main agent, no worktree, no workers, unless a flag below is given.
 
@@ -48,7 +55,9 @@ Hand every independent `AFK` slice (no unresolved blockers, not tagged `HITL`) t
 
 If this runtime has no worker primitive, or cannot give each worker its own worktree, build sequentially instead and say so. Parallel writers sharing one directory corrupt each other, so this fallback is mandatory rather than a preference. See `skills/_runtime/RUNTIMES.md`.
 
-Once the workers return, review each summary before marking its slice done - a returned summary is not itself confirmation the slice is correct.
+Each worker runs its own verification and posts the evidence to its own PR before returning, and reports the outcome as part of its summary.
+
+Once the workers return, review each summary before marking its slice done - a returned summary is not itself confirmation the slice is correct, and a worker reporting success without evidence is exactly the case this check exists for. A slice whose worker could not prove it follows the same `needs-proof` path as the sequential case.
 
 ## 5. When reality forces a deviation
 
@@ -56,4 +65,4 @@ If implementing a slice reveals that the PRD or an accepted ADR is wrong, incomp
 
 ## 6. Hand off
 
-Once the slices in scope for this pass are done, continue straight into `validate` to check the Definition of Done - it's read-only, so don't ask first unless the user said to stop after building. `validate` itself chains into `code-review` when the gate passes.
+Once the slices in scope for this pass are done, continue straight into `validate` to check the Definition of Done, unless the user said to stop after building. `validate` writes nothing, so don't ask first - though it does run the test suite and may run a verification, so it is not free. `validate` itself chains into `code-review` when the gate passes, and hands a gap list back here when it doesn't.
