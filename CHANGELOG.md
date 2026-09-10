@@ -2,6 +2,23 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.3.0] - 2026-09-10
+
+### Added
+
+- add why, how and recall ([#18](https://github.com/mauriciovieira/groundwork/pull/18))
+
+### Fixed
+
+- catch Portuguese as it is actually written, and check every tracked file ([#18](https://github.com/mauriciovieira/groundwork/pull/18))
+- close the gaps both review axes found ([#18](https://github.com/mauriciovieira/groundwork/pull/18))
+- refuse to certify a feature nothing can demonstrate ([#18](https://github.com/mauriciovieira/groundwork/pull/18))
+
+### Changed
+
+- drop the Portuguese language gate ([#18](https://github.com/mauriciovieira/groundwork/pull/18))
+- restore the credit assertions dropped with the language gate ([#18](https://github.com/mauriciovieira/groundwork/pull/18))
+
 ## [2.2.0] - 2026-09-10
 
 ### Added
