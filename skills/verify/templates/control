@@ -66,6 +66,10 @@ case "$CMD" in
     ;;
   prove)
     [ -n "$ARG" ] || die "prove needs a feature" "./control prove <feature>"
+    if [ "$DRY_RUN" -eq 1 ]; then
+      echo "would capture evidence for '$ARG' into $EVIDENCE_DIR"
+      exit 0
+    fi
     mkdir -p "$EVIDENCE_DIR"
     # TODO: capture the observable outcome into $EVIDENCE_DIR, then print a
     # short summary small enough to paste into an issue or PR. The file itself

@@ -19,7 +19,15 @@ cd "$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 . tests/lib.sh
 
 skill_dirs() { find skills -mindepth 1 -maxdepth 1 -type d ! -name '_*' | sort; }
-tracked_text() { git ls-files '*.md' '*.json' '*.yml' '*.yaml' '*.sh'; }
+# Every tracked file, not a list of extensions: NOTICE, LICENSE, .gitignore and
+# skills/verify/templates/control (a shebang script with no .sh suffix) are all
+# tracked text that an extension list silently excused from every check below.
+# Binary files are skipped rather than assumed absent.
+tracked_text() {
+  git ls-files | while IFS= read -r f; do
+    [ -f "$f" ] && perl -e 'exit(-B $ARGV[0] ? 1 : 0)' "$f" && printf '%s\n' "$f"
+  done
+}
 
 # ---------------------------------------------------------------- portability
 
@@ -163,15 +171,27 @@ group "Language"
 # Everything versioned here is English. Artifacts groundwork generates at
 # runtime follow the conversation's language, but those are not in this repo.
 # High-signal Portuguese words only, to keep false positives near zero.
-# Each word is written with a bracketed letter so the pattern still matches the
-# real word while this file never contains it - the same trick the typography
-# group uses. Without it the check reports itself and can never go green.
+# Two checks, because they catch opposite halves of the same problem.
+#
+# The word list below matches the UNACCENTED transliteration only: a bracketed
+# letter keeps the real word out of this file while still matching it. That was
+# the whole check once, and it had the realistic case backwards - this project
+# requires Portuguese to be written with its accents, so anything that actually
+# leaked in would be accented and sailed straight through: the transliterated
+# spelling of a word was caught and its correctly accented spelling was not.
+# Naming either spelling here would trip the check, which is the same trap the
+# typography group avoids by naming glyphs as codepoints.
 check_empty "no Portuguese in tracked files" \
   "$(grep -rniwE 'n[a]o|voc[e]|s[a]o|est[a]|ent[a]o|tamb[e]m|porqu[e]|iss[o]|aquil[o]|send[o]|apen[a]s' \
      $(tracked_text) 2>/dev/null || true)"
 
-check_empty "no Portuguese word endings in tracked files" \
-  "$(perl -CSD -ne 'print "$ARGV:$.: $&\n" if /\w+(\x{e7}\x{e3}o|\x{e7}\x{f5}es|\x{e3}o|\x{f5}es)/' \
+# The accented half. Everything versioned here is English, and English
+# technical prose does not carry these letters, so any word containing one is a
+# finding. Named by codepoint so this file stays ASCII and does not report
+# itself. A legitimate accented proper noun would trip this: that is a real
+# decision for whoever adds it, not a reason to weaken the check.
+check_empty "no accented Portuguese in tracked files" \
+  "$(perl -CSD -ne 'print "$ARGV:$.: $&\n" if /\w*[\x{e1}\x{e0}\x{e2}\x{e3}\x{e9}\x{ea}\x{ed}\x{f3}\x{f4}\x{f5}\x{fa}\x{fc}\x{e7}\x{c1}\x{c0}\x{c2}\x{c3}\x{c9}\x{ca}\x{cd}\x{d3}\x{d4}\x{d5}\x{da}\x{dc}\x{c7}]\w*/' \
      $(tracked_text) 2>/dev/null || true)"
 
 # --------------------------------------------------------------------- README
@@ -374,7 +394,7 @@ fi
 
 # Judges are read-only: a judge that can edit is a participant.
 for a in design-judge review-judge; do
-  if awk '/^---$/{n++; next} n==1{print}' "agents/$a.md" | grep -q 'disallowedTools: Write, Edit'; then
+  if fm "agents/$a.md" | grep -q 'disallowedTools: Write, Edit'; then
     pass "$a cannot write"
   else
     fail "$a can edit the work it judges"
@@ -393,8 +413,6 @@ fi
 
 group "Understanding skills stay read-only"
 
-fm_of() { awk '/^---$/{n++; next} n==1{print} n==2{exit}' "$1"; }
-
 # These are advisory: they must fire from a plain question, so none of them may
 # carry the flag that stops model invocation.
 for s in why how recall; do
@@ -404,7 +422,7 @@ for s in why how recall; do
     fail "$s is missing"
     continue
   fi
-  if fm_of "skills/$s/SKILL.md" | grep -q 'disable-model-invocation'; then
+  if fm "skills/$s/SKILL.md" | grep -q 'disable-model-invocation'; then
     fail "$s is flagged off model invocation, so a plain question never reaches it"
   else
     pass "$s can fire from a plain question"
