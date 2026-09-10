@@ -120,6 +120,13 @@ not left as a path into a gitignored scratch directory that vanishes with the wo
 Repositories with no `verify` block in their config simply skip this: `build` and `validate`
 say so once and carry on.
 
+This layer adapts ideas from [`pstack`](https://github.com/backnotprop/pstack) and the two
+"Complete Guide to pstack" articles by lauren (@poteto)
+([part 1](https://x.com/poteto/article/2094457600259842065),
+[part 2](https://x.com/poteto/article/2097732320606507506)) onto groundwork's own artifact
+model, rather than vendoring any of that work. The debt is the central claim: a harness is
+only worth what its agent can prove, not what it can assert.
+
 ## Understanding what is already here
 
 Three read-only skills, outside the flow, that spend the artifacts the rest of groundwork
@@ -163,8 +170,10 @@ an accepted ADR mandating something the standards baseline reads as a smell. It 
 real contradictions, never as a routine pass, and "both are right, a person has to change one
 of these documents" is an answer it is allowed to give.
 
-Both judges run on a stronger tier than the workers they judge, which is the one place in
-groundwork where that is worth paying for.
+Both judges run on a stronger tier than the workers they judge - the one place in groundwork
+where that is worth paying for - and `judges.model` in `config.json` sets which. The
+cross-judging idea comes from the same [pstack](https://github.com/backnotprop/pstack)
+articles credited above.
 
 ## Two speeds of survey
 
@@ -191,6 +200,13 @@ groundwork itself - every `SKILL.md`, command, and this README - is written in E
 ## Running on something other than Claude Code
 
 The skills are plain prose and name no runtime's tools or environment variables, so any agent that can load a skill can execute them. Three things do depend on the host: loading a sibling skill during a hand-off, running independent workers in their own contexts, and giving a parallel writer its own worktree. [`skills/_runtime/RUNTIMES.md`](skills/_runtime/RUNTIMES.md) says what each is for and what to do when the runtime has no primitive for it. Every degraded path is slower but never wrong, with one exception: parallel writers without worktree isolation must fall back to sequential building, because writers sharing a directory corrupt each other.
+
+**On Codex specifically:** the manifest declares `"skills": "./skills/"`, which is how the
+documented plugin schema exposes a plugin's skills. An earlier plan for this work also called
+for a `.codex-plugin/prompts/` directory; that was dropped deliberately, because `prompts` is
+not a field or component directory in the published manifest specification, and shipping one
+would be guessing at an interface rather than using the documented one. If Codex later grows a
+prompts component, adding it is a small change.
 
 `skills/` is the entire install surface. `agents/` sits outside it deliberately - those files describe workers in Claude Code's own frontmatter, which has no portable meaning. Each one states in its body what the worker is for, what it may not do, and what it must return; that half is portable, and a runtime with a different worker format should translate it rather than copy the frontmatter.
 

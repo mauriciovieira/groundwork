@@ -41,7 +41,7 @@ an earlier sketch before writing the next. See `../_runtime/RUNTIMES.md`.
 
 ## 4. Judge blind
 
-Hand the candidates to the `groundwork:design-judge` worker, stripped of any hint about who
+Hand the candidates to the `groundwork:design-judge` worker - on the tier named by `judges.model` in `config.json` if one is set, and never on the tier that produced the candidates - stripped of any hint about who
 produced which - no ordering that matches the brief order, no labels carrying the bias that
 generated them. Give it the criteria from step 1 and nothing else.
 

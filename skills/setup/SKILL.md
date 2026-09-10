@@ -92,7 +92,15 @@ One more optional block, `verify`, records where this repository's verification 
 "verify": { "cli": "verify/control", "evidence_dir": "verify/evidence" }
 ```
 
-Do not write it here. The `verify` skill writes it when `verify --init` builds the CLI, because the paths are only true once that exists. Its absence is the signal that this repository has no verification yet: `build` and `validate` say so once and carry on rather than blocking.
+A second optional block, `judges`, names the tier the judging workers run on:
+
+```json
+"judges": { "model": "opus" }
+```
+
+The point is that a judge must not run on the same tier as the work it judges - a reviewer and its arbiter at the same tier is the arrangement the arbiter exists to break. Ask for it only if the user brings it up; where it is absent, the judge agents' own default applies.
+
+Do not write the `verify` block here. The `verify` skill writes it when `verify --init` builds the CLI, because the paths are only true once that exists. Its absence is the signal that this repository has no verification yet: `build` and `validate` say so once and carry on rather than blocking.
 
 Set `project_type` to `"existing"` or `"greenfield"` per step 2. Only include `detected_stack` for `"existing"` - populate it with what was actually found, nothing invented. For `"greenfield"`, omit `detected_stack` entirely (or leave it `null`); the stack gets decided later, in `survey`, and recorded as ADRs, not here.
 

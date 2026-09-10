@@ -37,7 +37,7 @@ Where the repository has no `verify` block, say once that proof was not availabl
 
 ## 3. Check slice status
 
-Read the slices from the configured tracker (open/closed issues, or `tasks.md` statuses). Every slice from `to-issues` should be `done` or explicitly `deferred` with a stated reason. Flag any slice that's neither - stuck open with no explanation, or silently abandoned. A slice marked `needs-proof` is its own outcome: built, but never shown working. Report those separately from open slices, because the fix is different - they need a verification run, not implementation.
+Read the slices from the configured tracker. Where a slice's status lives differs, and `needs-proof` is the case that is easy to miss: on `github` and `linear` it is a comment on an issue that is still open, not a field, so read the comments rather than only the open/closed state. On `local` it is a `Status:` value in `tasks.md` alongside `open` and `done`. Every slice from `to-issues` should be `done` or explicitly `deferred` with a stated reason. Flag any slice that's neither - stuck open with no explanation, or silently abandoned. A slice marked `needs-proof` is its own outcome: built, but never shown working. Report those separately from open slices, because the fix is different - they need a verification run, not implementation.
 
 Check each slice's `Finish-condition` against reality too. A closed slice whose finish condition is not actually met was closed early.
 
