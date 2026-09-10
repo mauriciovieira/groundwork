@@ -2,6 +2,21 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.0.0] - 2026-09-10
+
+### Added
+
+- run on any agent that can load a skill ([#13](https://github.com/mauriciovieira/groundwork/pull/13))
+
+### Fixed
+
+- keep the Codex manifest version in step with the Claude ones ([#13](https://github.com/mauriciovieira/groundwork/pull/13))
+
+### Changed
+
+- drop runtime-specific references from skill prose ([#13](https://github.com/mauriciovieira/groundwork/pull/13))
+- cover multi-runtime install and credit prior art ([#13](https://github.com/mauriciovieira/groundwork/pull/13))
+
 ## [1.0.0] - 2026-08-10
 
 ### Added
