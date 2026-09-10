@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.2.0] - 2026-09-10
+
+### Added
+
+- stop letting the author of a thing be its judge ([#17](https://github.com/mauriciovieira/groundwork/pull/17))
+
 ## [2.1.0] - 2026-09-10
 
 ### Added
