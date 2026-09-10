@@ -2,7 +2,7 @@
   "name": "groundwork",
   "displayName": "Groundwork",
   "description": "Spec-driven development framework for Claude Code: Socratic discovery, PRDs, ADRs, tracer-bullet issues, TDD execution, and review. Advisory skills fire automatically; side-effectful steps wait for your confirmation.",
-  "version": "2.3.2",
+  "version": "2.4.0",
   "author": {
     "name": "Mauricio Vieira",
     "email": "mauricio.vieira@gmail.com"

@@ -1,6 +1,6 @@
 {
   "name": "groundwork",
-  "version": "2.3.2",
+  "version": "2.4.0",
   "description": "Spec-driven development framework: Socratic discovery, PRDs, ADRs, tracer-bullet issues, TDD execution, and review.",
   "author": {
     "name": "Mauricio Vieira",

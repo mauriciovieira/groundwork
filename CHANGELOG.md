@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.4.0] - 2026-09-10
+
+### Added
+
+- verify the foundation and commit one transformation at a time ([#21](https://github.com/mauriciovieira/groundwork/pull/21))
+
 ## [2.3.2] - 2026-09-10
 
 ### Changed
