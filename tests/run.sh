@@ -152,8 +152,11 @@ group "Language"
 # Everything versioned here is English. Artifacts groundwork generates at
 # runtime follow the conversation's language, but those are not in this repo.
 # High-signal Portuguese words only, to keep false positives near zero.
+# Each word is written with a bracketed letter so the pattern still matches the
+# real word while this file never contains it - the same trick the typography
+# group uses. Without it the check reports itself and can never go green.
 check_empty "no Portuguese in tracked files" \
-  "$(grep -rniwE 'n(a|A)o|voc(e|E)|s(a|A)o|est(a|A)|ent(a|A)o|tamb(e|E)m|porqu(e|E)|isso|aquilo' \
+  "$(grep -rniwE 'n[a]o|voc[e]|s[a]o|est[a]|ent[a]o|tamb[e]m|porqu[e]|iss[o]|aquil[o]|send[o]|apen[a]s' \
      $(tracked_text) 2>/dev/null || true)"
 
 check_empty "no Portuguese word endings in tracked files" \
