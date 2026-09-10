@@ -44,6 +44,9 @@ The result: you can still drive everything with explicit commands, but a plain "
 | `/groundwork:validate` | Definition-of-Done gate: every acceptance criterion tested, every slice done or deferred, no ADR (Architecture Decision Record) violated. |
 | `/groundwork:code-review` | Reviews the diff along a Standards axis and a Spec axis, in parallel, then merges both reports. A third worker arbitrates only where the two axes contradict each other. |
 | `/groundwork:quick` | The escape hatch: does a trivial task directly, no PRD/ADR/issues. |
+| `/groundwork:why` | Recovers the reasoning behind a decision, from the ADRs first, then history and the tracker. Read-only. |
+| `/groundwork:how` | Explains how something works, from the feature map first, then a trace through the code. Read-only. |
+| `/groundwork:recall` | Rebuilds where a piece of work stands, from artifacts that already exist. Writes nothing. |
 | `/groundwork:improve-codebase-architecture` | Periodic architecture review: finds deepening opportunities informed by `glossary.md` and `adr/`, interviews through the chosen candidate, updates both as decisions land. Not part of the linear flow - run it whenever, not per-feature. |
 
 Three more skills back the orchestrators above but aren't meant to be invoked directly, since they're only ever reached from inside one: `interview-loop` (the interview loop behind `survey`), `tdd` (the red-green-refactor loop behind `build`), and `worktree` (isolated branch-per-slice behind `build --worktree`).
@@ -114,8 +117,39 @@ terminal and any agent run the same thing:
 per acceptance criterion rather than a passing test alone. Evidence is posted to the tracker,
 not left as a path into a gitignored scratch directory that vanishes with the worktree.
 
-Repositories with no `verify` block in their config simply skip this: `build` and `validate`
-say so once and carry on.
+A repository with no verification set up can still build - `build` says so once and carries
+on, because building unproven work is allowed. What is not allowed is certifying it: `validate`
+refuses to pass a feature nothing can demonstrate, reports every criterion as
+`covered-unproven`, and points at `verify --init`. That is the case most likely to be quietly
+certified for years, so the gate is deliberately the one place it gets caught.
+
+This layer adapts ideas from [`pstack`](https://github.com/backnotprop/pstack) and the two
+"Complete Guide to pstack" articles by lauren (@poteto)
+([part 1](https://x.com/poteto/article/2094457600259842065),
+[part 2](https://x.com/poteto/article/2097732320606507506)) onto groundwork's own artifact
+model, rather than vendoring any of that work. The debt is the central claim: a harness is
+only worth what its agent can prove, not what it can assert.
+
+## Understanding what is already here
+
+Three read-only skills, outside the flow, that spend the artifacts the rest of groundwork
+writes. They are cheap here precisely because those artifacts exist - each one starts from a
+record rather than from source code.
+
+- **`why`** reads the ADRs first, because recording decisions is what ADRs are for. Then the
+  PRD, `.out-of-scope/`, git history, and the tracker. It grades its own certainty as
+  **decided**, **recorded**, **inferred**, or **lost** - and says *lost* rather than
+  constructing a plausible story, because an invented rationale gets repeated.
+- **`how`** reads the feature map first, since that is already a behavioural description, then
+  traces the mechanism in code. If the two disagree, that finding matters more than the
+  explanation.
+- **`recall`** rebuilds where work stands from `prd.md`, the ADRs, tracker state, the survey
+  map, git history and `quicklog.md`. It **writes nothing**: groundwork carried a
+  hand-maintained state file once and removed it in 0.2.6, because a file that must be kept
+  current is one more thing to forget, and a stale state file is worse than none since it is
+  trusted.
+
+There is no `teach`. It would be `how` plus `why`, and those compose without a skill to say so.
 
 ## Nothing grades its own homework
 
@@ -139,8 +173,10 @@ an accepted ADR mandating something the standards baseline reads as a smell. It 
 real contradictions, never as a routine pass, and "both are right, a person has to change one
 of these documents" is an answer it is allowed to give.
 
-Both judges run on a stronger tier than the workers they judge, which is the one place in
-groundwork where that is worth paying for.
+Both judges run on a stronger tier than the workers they judge - the one place in groundwork
+where that is worth paying for - and `judges.model` in `config.json` sets which. The
+cross-judging idea comes from the same [pstack](https://github.com/backnotprop/pstack)
+articles credited above.
 
 ## Two speeds of survey
 
@@ -167,6 +203,13 @@ groundwork itself - every `SKILL.md`, command, and this README - is written in E
 ## Running on something other than Claude Code
 
 The skills are plain prose and name no runtime's tools or environment variables, so any agent that can load a skill can execute them. Three things do depend on the host: loading a sibling skill during a hand-off, running independent workers in their own contexts, and giving a parallel writer its own worktree. [`skills/_runtime/RUNTIMES.md`](skills/_runtime/RUNTIMES.md) says what each is for and what to do when the runtime has no primitive for it. Every degraded path is slower but never wrong, with one exception: parallel writers without worktree isolation must fall back to sequential building, because writers sharing a directory corrupt each other.
+
+**On Codex specifically:** the manifest declares `"skills": "./skills/"`, which is how the
+documented plugin schema exposes a plugin's skills. An earlier plan for this work also called
+for a `.codex-plugin/prompts/` directory; that was dropped deliberately, because `prompts` is
+not a field or component directory in the published manifest specification, and shipping one
+would be guessing at an interface rather than using the documented one. If Codex later grows a
+prompts component, adding it is a small change.
 
 `skills/` is the entire install surface. `agents/` sits outside it deliberately - those files describe workers in Claude Code's own frontmatter, which has no portable meaning. Each one states in its body what the worker is for, what it may not do, and what it must return; that half is portable, and a runtime with a different worker format should translate it rather than copy the frontmatter.
 

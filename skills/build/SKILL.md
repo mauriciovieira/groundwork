@@ -13,14 +13,14 @@ Implement the slices `to-issues` created - or, for issues `triage` marked `ready
 
 Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of the groundwork `setup` skill: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. Running `setup` explicitly is only for customizing.
 
-Note whether the config has a `verify` block. If it does, every slice has to be proven before it closes (step 2 below). If it doesn't, say once that this repository has no verification set up and that slices will close on tests alone, mention `verify --init` as the way to change that, and carry on. Never block a build over it.
+Note whether the config has a `verify` block. If it does, every slice has to be proven before it closes (step 2 below). If it doesn't, say once that this repository has no verification set up, that slices will close on tests alone here, and that `validate` will refuse to pass the feature until `verify --init` has run. Then carry on. Never block a build over it - building unproven work is allowed, certifying it as done is not.
 
 ## 1. Read the open, unblocked slices
 
 Pull from the configured tracker:
 
-- `github`: `gh issue list`, filtered to open issues not marked `Blocked by` an issue that's still open.
-- `linear`: query via the Linear MCP tools for open issues in this feature whose blockers are resolved.
+- `github`: `gh issue list`, filtered to open issues not marked `Blocked by` an issue that's still open. Read each candidate's comments before treating it as unbuilt: an issue carrying a `Status: needs-proof` comment is finished work waiting only on evidence, so go straight to proving it in step 3 rather than rebuilding it.
+- `linear`: query via the Linear MCP tools for open issues in this feature whose blockers are resolved. Check comments for `Status: needs-proof` the same way, and for the same reason.
 - `local`: parse `docs/groundwork/features/NNNN-slug/tasks.md` for slices with `Status: open` or `Status: needs-proof` whose `Blocked-by` slices are already `Status: done`. A `needs-proof` slice is built work waiting only on evidence, so pick it up again and go straight to proving it rather than rebuilding it.
 
 If this repo also uses `triage`, the tracker will contain raw inbound issues too - ones still sitting in `needs-triage`, `needs-info`, or otherwise not yet through the triage state machine, and possibly carrying an unrelated "Type:" field of their own (many issue templates have one, e.g. "Type: bug"). Skip anything whose `Type` field isn't exactly `AFK` or `HITL` (in whichever format applies, see below) - that's the actual signal a slice or Agent Brief exists, not just the presence of some field named `Type`. Don't attempt to build it.
@@ -41,7 +41,9 @@ For each unblocked slice, in order:
    - `local`: set `Status: needs-proof` in `tasks.md`, alongside the existing `open` and `done`.
 5. Move to the next unblocked slice.
 
-At the end of the pass, report the slices that closed and, separately, the ones left needing proof. Never fold the two together into a count of slices "done".
+At the end of the pass, run `verify --sync` if this repository has verification, so the feature map reflects what this pass actually changed. A slice that added or altered user-visible behaviour has just made the map stale, and a stale feature map is worse than none because the next verification trusts it.
+
+Then report the slices that closed and, separately, the ones left needing proof. Never fold the two together into a count of slices "done".
 
 This runs entirely in the main agent, no worktree, no workers, unless a flag below is given.
 

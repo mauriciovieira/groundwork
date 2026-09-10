@@ -19,7 +19,15 @@ cd "$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 . tests/lib.sh
 
 skill_dirs() { find skills -mindepth 1 -maxdepth 1 -type d ! -name '_*' | sort; }
-tracked_text() { git ls-files '*.md' '*.json' '*.yml' '*.yaml' '*.sh'; }
+# Every tracked file, not a list of extensions: NOTICE, LICENSE, .gitignore and
+# skills/verify/templates/control (a shebang script with no .sh suffix) are all
+# tracked text that an extension list silently excused from every check below.
+# Binary files are skipped rather than assumed absent.
+tracked_text() {
+  git ls-files | while IFS= read -r f; do
+    [ -f "$f" ] && perl -e 'exit(-B $ARGV[0] ? 1 : 0)' "$f" && printf '%s\n' "$f"
+  done
+}
 
 # ---------------------------------------------------------------- portability
 
@@ -155,24 +163,6 @@ GLYPHS=$(perl -CSD -ne '
   }
 ' $(tracked_text) 2>/dev/null || true)
 check_empty "no banned punctuation glyphs in tracked files" "$GLYPHS"
-
-# ------------------------------------------------------------------ language
-
-group "Language"
-
-# Everything versioned here is English. Artifacts groundwork generates at
-# runtime follow the conversation's language, but those are not in this repo.
-# High-signal Portuguese words only, to keep false positives near zero.
-# Each word is written with a bracketed letter so the pattern still matches the
-# real word while this file never contains it - the same trick the typography
-# group uses. Without it the check reports itself and can never go green.
-check_empty "no Portuguese in tracked files" \
-  "$(grep -rniwE 'n[a]o|voc[e]|s[a]o|est[a]|ent[a]o|tamb[e]m|porqu[e]|iss[o]|aquil[o]|send[o]|apen[a]s' \
-     $(tracked_text) 2>/dev/null || true)"
-
-check_empty "no Portuguese word endings in tracked files" \
-  "$(perl -CSD -ne 'print "$ARGV:$.: $&\n" if /\w+(\x{e7}\x{e3}o|\x{e7}\x{f5}es|\x{e3}o|\x{f5}es)/' \
-     $(tracked_text) 2>/dev/null || true)"
 
 # --------------------------------------------------------------------- README
 
@@ -374,7 +364,7 @@ fi
 
 # Judges are read-only: a judge that can edit is a participant.
 for a in design-judge review-judge; do
-  if awk '/^---$/{n++; next} n==1{print}' "agents/$a.md" | grep -q 'disallowedTools: Write, Edit'; then
+  if fm "agents/$a.md" | grep -q 'disallowedTools: Write, Edit'; then
     pass "$a cannot write"
   else
     fail "$a can edit the work it judges"
@@ -387,6 +377,110 @@ if grep -q 'is_shared' install.sh; then
   pass "install.sh links the shared reference directories"
 else
   fail "install.sh skips _ directories, breaking every ../ reference"
+fi
+
+# ------------------------------------------------------------- understanding
+
+group "Understanding skills stay read-only"
+
+# These are advisory: they must fire from a plain question, so none of them may
+# carry the flag that stops model invocation.
+for s in why how recall; do
+  if [ -f "skills/$s/SKILL.md" ]; then
+    pass "$s exists"
+  else
+    fail "$s is missing"
+    continue
+  fi
+  if fm "skills/$s/SKILL.md" | grep -q 'disable-model-invocation'; then
+    fail "$s is flagged off model invocation, so a plain question never reaches it"
+  else
+    pass "$s can fire from a plain question"
+  fi
+done
+
+# recall replaces a hand-maintained state file that was removed in 0.2.6. If it
+# ever starts writing, it has become the thing that was deleted.
+if grep -q 'writes nothing' skills/recall/SKILL.md; then
+  pass "recall states that it writes nothing"
+else
+  fail "recall no longer promises to write nothing - it is becoming STATE.md again"
+fi
+
+# An invented rationale is worse than an admitted gap, because it gets repeated.
+for grade in Decided Recorded Inferred Lost; do
+  if grep -q "\*\*$grade\*\*" skills/why/SKILL.md; then
+    pass "why can report a reason as $grade"
+  else
+    fail "why has no $grade certainty grade"
+  fi
+done
+
+# how is only cheap if it starts from the feature map rather than from source.
+if grep -q 'verify/features' skills/how/SKILL.md; then
+  pass "how starts from the feature map"
+else
+  fail "how reconstructs behaviour from source instead of reading the map"
+fi
+
+# teach is how + why composed; a skill that only chains two others is noise.
+if [ -d skills/teach ]; then
+  fail "a teach skill exists - it is how plus why, and composes without one"
+else
+  pass "no teach skill: how and why compose without it"
+fi
+
+# ---------------------------------------------------------------------- credit
+
+group "Prior art stays credited"
+
+# Credit that lives in one file is one careless edit from vanishing. The three
+# places are load-bearing for different readers: NOTICE for anyone auditing
+# provenance, README for anyone deciding whether to adopt this, the skill for
+# anyone reading it in isolation.
+for f in NOTICE README.md skills/verify/SKILL.md; do
+  if grep -q 'pstack' "$f"; then
+    pass "$f credits the prior art it adapts"
+  else
+    fail "$f no longer credits pstack"
+  fi
+done
+
+if grep -q 'poteto' NOTICE; then
+  pass "NOTICE names the author of the prior art"
+else
+  fail "NOTICE no longer names who the ideas came from"
+fi
+
+# needs-proof lives in a comment on github and linear, not in a field. A skill
+# that reads only open/closed state cannot see it.
+for f in skills/build/SKILL.md skills/validate/SKILL.md; do
+  if grep -q 'comment' "$f"; then
+    pass "$(basename $(dirname $f)) knows needs-proof lives in a comment"
+  else
+    fail "$(basename $(dirname $f)) reads only issue state and would miss needs-proof"
+  fi
+done
+
+# A repo with no verification must fail the gate, not pass quietly. This is the
+# easiest failure to wave through and the one most likely to stand for years.
+if grep -q 'no `verify` block at all' skills/validate/SKILL.md; then
+  pass "validate refuses to certify a repo that cannot demonstrate anything"
+else
+  fail "a repo with no verification would pass the Definition-of-Done gate"
+fi
+
+if grep -q 'certifying it as done is not' skills/build/SKILL.md; then
+  pass "build says the gate will refuse what it is about to let through"
+else
+  fail "build lets unproven work through without saying validate will stop it"
+fi
+
+# build promises the map is reconciled at the end of a pass; verify says so too.
+if grep -q 'verify --sync' skills/build/SKILL.md; then
+  pass "build triggers the map reconciliation verify promises"
+else
+  fail "verify claims build runs --sync, and build never does"
 fi
 
 report

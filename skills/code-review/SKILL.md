@@ -8,6 +8,10 @@ argument-hint: "[since-ref]"
 
 Two independent reviews, run in parallel so neither agent's findings bias the other's, then merged into one report - with a third worker arbitrating only where the two axes contradict each other.
 
+## 0. Preconditions
+
+Read `docs/groundwork/config.json` if it exists. This skill needs only one thing from it, `judges.model`, and works fine without it - do not bootstrap a config just to run a review.
+
 ## 1. Determine the diff
 
 Figure out the fixed point to diff against: an argument if one was given (a commit, branch, or tag), otherwise the merge-base with the feature's target branch, or ask if it's genuinely ambiguous. Confirm the range before dispatching anything.
@@ -28,7 +32,7 @@ If there are none, skip step 4 entirely. Most reviews have none, and manufacturi
 
 ## 4. Arbitrate the contradictions
 
-For each real conflict, run the `groundwork:review-judge` worker with both findings, the code in question, and the ADR or standard each side is citing. Neither reviewer arbitrates its own finding - that is the whole reason this step is a separate worker rather than a judgement call in the merge.
+For each real conflict, run the `groundwork:review-judge` worker with both findings, the code in question, and the ADR or standard each side is citing. If `config.json` carries a `judges.model` value, dispatch the judge on that tier explicitly; otherwise the agent's own default stands. Either way it must not be the tier the two reviewers ran on. Neither reviewer arbitrates its own finding - that is the whole reason this step is a separate worker rather than a judgement call in the merge.
 
 The judge returns which side holds and why, or reports that the conflict is real and unresolvable at this level, which usually means an accepted ADR and the coding standards genuinely contradict each other and a person has to fix one of them. Say that plainly rather than picking a winner to look decisive.
 
