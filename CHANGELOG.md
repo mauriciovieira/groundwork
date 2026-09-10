@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.3.2] - 2026-09-10
+
+### Changed
+
+- draw the flow and document the proof loop ([#20](https://github.com/mauriciovieira/groundwork/pull/20))
+
 ## [2.3.1] - 2026-09-10
 
 ### Changed
