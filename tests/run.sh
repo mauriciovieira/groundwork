@@ -430,4 +430,43 @@ else
   pass "no teach skill: how and why compose without it"
 fi
 
+# ---------------------------------------------------------------------- credit
+
+group "Prior art stays credited"
+
+# Credit that lives in one file is one careless edit from vanishing. The three
+# places are load-bearing for different readers: NOTICE for anyone auditing
+# provenance, README for anyone deciding whether to adopt this, the skill for
+# anyone reading it in isolation.
+for f in NOTICE README.md skills/verify/SKILL.md; do
+  if grep -q 'pstack' "$f"; then
+    pass "$f credits the prior art it adapts"
+  else
+    fail "$f no longer credits pstack"
+  fi
+done
+
+if grep -q 'poteto' NOTICE; then
+  pass "NOTICE names the author of the prior art"
+else
+  fail "NOTICE no longer names who the ideas came from"
+fi
+
+# needs-proof lives in a comment on github and linear, not in a field. A skill
+# that reads only open/closed state cannot see it.
+for f in skills/build/SKILL.md skills/validate/SKILL.md; do
+  if grep -q 'comment' "$f"; then
+    pass "$(basename $(dirname $f)) knows needs-proof lives in a comment"
+  else
+    fail "$(basename $(dirname $f)) reads only issue state and would miss needs-proof"
+  fi
+done
+
+# build promises the map is reconciled at the end of a pass; verify says so too.
+if grep -q 'verify --sync' skills/build/SKILL.md; then
+  pass "build triggers the map reconciliation verify promises"
+else
+  fail "verify claims build runs --sync, and build never does"
+fi
+
 report
