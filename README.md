@@ -109,6 +109,25 @@ building unproven work is allowed - but `validate` refuses to certify a feature 
 demonstrate, and points at `verify --init`. That is the easiest failure to wave through and the
 one most likely to stand for years, so the gate is deliberately the only place it gets caught.
 
+### One transformation at a time
+
+`build` runs the repository's gates before it touches anything. A slice started on a red base
+makes every later failure ambiguous - you cannot tell your own breakage from what was already
+broken, and the debugging goes to the wrong change. If the foundation is red, `build` stops and
+offers to fix that first, as its own work.
+
+Inside a slice, [`skills/_shared/ATOMIC-CHANGES.md`](skills/_shared/ATOMIC-CHANGES.md) governs
+how the work reaches the history: one kind of change per commit, subtractive and structural
+work before additive, and corrections as a `fixup!` aimed at the commit that introduced the
+defect rather than an amend that hides it before review. Each commit leaves the repository
+whole - passing the gates its change touches and standing alone - and that, not line count,
+is what bounds how small a commit can be.
+
+That discipline is adapted from the `atomic-changes` skill by
+[Dan Kubb](https://github.com/dkubb/skills/blob/main/skills/atomic-changes/SKILL.md), onto
+groundwork's own model: `to-issues` already decides how a feature is cut into slices, so this
+governs the commits within one.
+
 ### Outside the flow
 
 | Skill | When |
