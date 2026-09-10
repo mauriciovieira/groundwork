@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.3.1] - 2026-09-10
+
+### Changed
+
+- verify groundwork with its own verification skill ([#19](https://github.com/mauriciovieira/groundwork/pull/19))
+- record the verify config and keep evidence out of git ([#19](https://github.com/mauriciovieira/groundwork/pull/19))
+
 ## [2.3.0] - 2026-09-10
 
 ### Added
