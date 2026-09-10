@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "tracker": "github",
+  "docs_dir": "docs/groundwork",
+  "triage_labels": [],
+  "triage_role_labels": {},
+  "rules_file": "claude",
+  "project_type": "existing",
+  "detected_stack": {
+    "language": "markdown and POSIX sh",
+    "framework": "Claude Code / Codex plugin",
+    "package_manager": "none",
+    "notes": "No runtime. The deliverable is the skills tree itself, loaded by an agent. jq and perl are the only external tools."
+  },
+  "github": {
+    "repo": "mauriciovieira/groundwork"
+  }
+}
