@@ -117,8 +117,11 @@ terminal and any agent run the same thing:
 per acceptance criterion rather than a passing test alone. Evidence is posted to the tracker,
 not left as a path into a gitignored scratch directory that vanishes with the worktree.
 
-Repositories with no `verify` block in their config simply skip this: `build` and `validate`
-say so once and carry on.
+A repository with no verification set up can still build - `build` says so once and carries
+on, because building unproven work is allowed. What is not allowed is certifying it: `validate`
+refuses to pass a feature nothing can demonstrate, reports every criterion as
+`covered-unproven`, and points at `verify --init`. That is the case most likely to be quietly
+certified for years, so the gate is deliberately the one place it gets caught.
 
 This layer adapts ideas from [`pstack`](https://github.com/backnotprop/pstack) and the two
 "Complete Guide to pstack" articles by lauren (@poteto)

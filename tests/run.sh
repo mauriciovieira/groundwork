@@ -462,6 +462,20 @@ for f in skills/build/SKILL.md skills/validate/SKILL.md; do
   fi
 done
 
+# A repo with no verification must fail the gate, not pass quietly. This is the
+# easiest failure to wave through and the one most likely to stand for years.
+if grep -q 'no `verify` block at all' skills/validate/SKILL.md; then
+  pass "validate refuses to certify a repo that cannot demonstrate anything"
+else
+  fail "a repo with no verification would pass the Definition-of-Done gate"
+fi
+
+if grep -q 'certifying it as done is not' skills/build/SKILL.md; then
+  pass "build says the gate will refuse what it is about to let through"
+else
+  fail "build lets unproven work through without saying validate will stop it"
+fi
+
 # build promises the map is reconciled at the end of a pass; verify says so too.
 if grep -q 'verify --sync' skills/build/SKILL.md; then
   pass "build triggers the map reconciliation verify promises"

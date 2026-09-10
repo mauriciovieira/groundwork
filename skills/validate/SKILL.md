@@ -33,7 +33,7 @@ Report each criterion as exactly one of:
 - **`uncovered`** - no test exercises it
 - **`failing`** - a test exercises it and does not pass
 
-Where the repository has no `verify` block, say once that proof was not available and report `covered` rather than `covered+proven`, so nobody later reads an unproven feature as a proven one.
+Where the repository has no `verify` block at all, every criterion is `covered-unproven` - there is no way to prove any of them. Say that once, as one fact about the repository rather than once per criterion, and name `verify --init` as what fixes it. Do not invent a softer outcome for this case: a feature nobody can demonstrate is not a feature anybody has finished, and a repository without verification is the case most likely to be quietly certified for years.
 
 ## 3. Check slice status
 
@@ -50,6 +50,8 @@ For every `Accepted` ADR under the feature's `adr/`, and any relevant `Accepted`
 Give a verdict per acceptance criterion, per slice, and per ADR, not just an overall one. For anything that fails, say exactly what's missing and where.
 
 **If everything passes**, say so clearly and continue straight into `code-review` before merging.
+
+**If this repository has no verification at all**, the gate does not pass. Report every criterion as `covered-unproven`, say plainly that nothing here can be demonstrated, and point at `verify --init`. This is the one failure the user can close in a single step, and it is also the one they are most likely to want waved through - do not wave it through. `build` deliberately does not block on this, so the gate is the only place it is ever caught.
 
 **If anything failed**, don't just stop. Say what would close each gap, and offer to go back into `build` with that exact list - uncovered criteria need tests, `covered-unproven` ones need a verification run, `needs-proof` slices need evidence, and a failing test needs a fix. Hand the list over rather than making the user reconstruct it. Review waits until the gaps are closed.
 

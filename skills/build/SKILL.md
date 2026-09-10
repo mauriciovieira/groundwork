@@ -13,7 +13,7 @@ Implement the slices `to-issues` created - or, for issues `triage` marked `ready
 
 Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of the groundwork `setup` skill: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. Running `setup` explicitly is only for customizing.
 
-Note whether the config has a `verify` block. If it does, every slice has to be proven before it closes (step 2 below). If it doesn't, say once that this repository has no verification set up and that slices will close on tests alone, mention `verify --init` as the way to change that, and carry on. Never block a build over it.
+Note whether the config has a `verify` block. If it does, every slice has to be proven before it closes (step 2 below). If it doesn't, say once that this repository has no verification set up, that slices will close on tests alone here, and that `validate` will refuse to pass the feature until `verify --init` has run. Then carry on. Never block a build over it - building unproven work is allowed, certifying it as done is not.
 
 ## 1. Read the open, unblocked slices
 
