@@ -44,6 +44,9 @@ The result: you can still drive everything with explicit commands, but a plain "
 | `/groundwork:validate` | Definition-of-Done gate: every acceptance criterion tested, every slice done or deferred, no ADR (Architecture Decision Record) violated. |
 | `/groundwork:code-review` | Reviews the diff along a Standards axis and a Spec axis, in parallel, then merges both reports. A third worker arbitrates only where the two axes contradict each other. |
 | `/groundwork:quick` | The escape hatch: does a trivial task directly, no PRD/ADR/issues. |
+| `/groundwork:why` | Recovers the reasoning behind a decision, from the ADRs first, then history and the tracker. Read-only. |
+| `/groundwork:how` | Explains how something works, from the feature map first, then a trace through the code. Read-only. |
+| `/groundwork:recall` | Rebuilds where a piece of work stands, from artifacts that already exist. Writes nothing. |
 | `/groundwork:improve-codebase-architecture` | Periodic architecture review: finds deepening opportunities informed by `glossary.md` and `adr/`, interviews through the chosen candidate, updates both as decisions land. Not part of the linear flow - run it whenever, not per-feature. |
 
 Three more skills back the orchestrators above but aren't meant to be invoked directly, since they're only ever reached from inside one: `interview-loop` (the interview loop behind `survey`), `tdd` (the red-green-refactor loop behind `build`), and `worktree` (isolated branch-per-slice behind `build --worktree`).
@@ -116,6 +119,27 @@ not left as a path into a gitignored scratch directory that vanishes with the wo
 
 Repositories with no `verify` block in their config simply skip this: `build` and `validate`
 say so once and carry on.
+
+## Understanding what is already here
+
+Three read-only skills, outside the flow, that spend the artifacts the rest of groundwork
+writes. They are cheap here precisely because those artifacts exist - each one starts from a
+record rather than from source code.
+
+- **`why`** reads the ADRs first, because recording decisions is what ADRs are for. Then the
+  PRD, `.out-of-scope/`, git history, and the tracker. It grades its own certainty as
+  **decided**, **recorded**, **inferred**, or **lost** - and says *lost* rather than
+  constructing a plausible story, because an invented rationale gets repeated.
+- **`how`** reads the feature map first, since that is already a behavioural description, then
+  traces the mechanism in code. If the two disagree, that finding matters more than the
+  explanation.
+- **`recall`** rebuilds where work stands from `prd.md`, the ADRs, tracker state, the survey
+  map, git history and `quicklog.md`. It **writes nothing**: groundwork carried a
+  hand-maintained state file once and removed it in 0.2.6, because a file that must be kept
+  current is one more thing to forget, and a stale state file is worse than none since it is
+  trusted.
+
+There is no `teach`. It would be `how` plus `why`, and those compose without a skill to say so.
 
 ## Nothing grades its own homework
 

@@ -389,4 +389,57 @@ else
   fail "install.sh skips _ directories, breaking every ../ reference"
 fi
 
+# ------------------------------------------------------------- understanding
+
+group "Understanding skills stay read-only"
+
+fm_of() { awk '/^---$/{n++; next} n==1{print} n==2{exit}' "$1"; }
+
+# These are advisory: they must fire from a plain question, so none of them may
+# carry the flag that stops model invocation.
+for s in why how recall; do
+  if [ -f "skills/$s/SKILL.md" ]; then
+    pass "$s exists"
+  else
+    fail "$s is missing"
+    continue
+  fi
+  if fm_of "skills/$s/SKILL.md" | grep -q 'disable-model-invocation'; then
+    fail "$s is flagged off model invocation, so a plain question never reaches it"
+  else
+    pass "$s can fire from a plain question"
+  fi
+done
+
+# recall replaces a hand-maintained state file that was removed in 0.2.6. If it
+# ever starts writing, it has become the thing that was deleted.
+if grep -q 'writes nothing' skills/recall/SKILL.md; then
+  pass "recall states that it writes nothing"
+else
+  fail "recall no longer promises to write nothing - it is becoming STATE.md again"
+fi
+
+# An invented rationale is worse than an admitted gap, because it gets repeated.
+for grade in Decided Recorded Inferred Lost; do
+  if grep -q "\*\*$grade\*\*" skills/why/SKILL.md; then
+    pass "why can report a reason as $grade"
+  else
+    fail "why has no $grade certainty grade"
+  fi
+done
+
+# how is only cheap if it starts from the feature map rather than from source.
+if grep -q 'verify/features' skills/how/SKILL.md; then
+  pass "how starts from the feature map"
+else
+  fail "how reconstructs behaviour from source instead of reading the map"
+fi
+
+# teach is how + why composed; a skill that only chains two others is noise.
+if [ -d skills/teach ]; then
+  fail "a teach skill exists - it is how plus why, and composes without one"
+else
+  pass "no teach skill: how and why compose without it"
+fi
+
 report
