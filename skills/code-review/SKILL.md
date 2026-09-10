@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Use when the user asks for a review of the current diff, branch, or recent changes in a repo that uses groundwork. Reviews the diff since a fixed point using two parallel sub-agents - a Standards axis and a Spec axis - so neither pollutes the other's context, then merges both reports.
+description: Use when the user asks for a review of the current diff, branch, or recent changes in a repo that uses groundwork. Reviews the diff since a fixed point using two independent workers - a Standards axis and a Spec axis - so neither pollutes the other's context, then merges both reports.
 argument-hint: "[since-ref]"
 ---
 
@@ -12,9 +12,11 @@ Two independent reviews, run in parallel so neither agent's findings bias the ot
 
 Figure out the fixed point to diff against: an argument if one was given (a commit, branch, or tag), otherwise the merge-base with the feature's target branch, or ask if it's genuinely ambiguous. Confirm the range before dispatching anything.
 
-## 2. Dispatch both reviewers in parallel
+## 2. Run both reviewers as independent workers
 
-Dispatch `groundwork:standards-reviewer` and `groundwork:spec-reviewer` at the same time, each with the diff (or the ref range to diff themselves) and, for the spec reviewer, the feature slug and the issue/slice this diff claims to close. Run them concurrently - do not wait for one to finish before starting the other.
+Run `groundwork:standards-reviewer` and `groundwork:spec-reviewer` as two independent workers, each in its own context, each given the diff (or the ref range to diff themselves) and, for the spec reviewer, the feature slug and the issue/slice this diff claims to close. Start both before waiting on either.
+
+The isolation is the point here, not the speed - neither axis may see the other's findings. If this runtime has no worker primitive, run them one after the other, each from a clean reading of its own brief, and say so once. Never collapse the two axes into a single combined review; that destroys the independence they exist for. See `skills/_runtime/RUNTIMES.md`.
 
 ## 3. Merge the reports
 

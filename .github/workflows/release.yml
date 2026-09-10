@@ -70,6 +70,11 @@ jobs:
           jq --indent 2 --arg v "$NEW_VERSION" '.plugins[0].version = $v' .claude-plugin/marketplace.json > /tmp/marketplace.json
           mv /tmp/marketplace.json .claude-plugin/marketplace.json
 
+          # The Codex manifest carries its own version field and must not drift
+          # from the Claude one - tests/run.sh asserts all three are equal.
+          jq --indent 2 --arg v "$NEW_VERSION" '.version = $v' .codex-plugin/plugin.json > /tmp/codex-plugin.json
+          mv /tmp/codex-plugin.json .codex-plugin/plugin.json
+
           echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Build changelog entry
@@ -178,7 +183,7 @@ jobs:
 
           NEW_VERSION="${{ steps.bump.outputs.new_version }}"
 
-          git add .claude-plugin/plugin.json .claude-plugin/marketplace.json CHANGELOG.md
+          git add .claude-plugin/plugin.json .claude-plugin/marketplace.json .codex-plugin/plugin.json CHANGELOG.md
           git commit -m "chore(release): v${NEW_VERSION}"
 
           # concurrency: group already serializes runs of this workflow, so this

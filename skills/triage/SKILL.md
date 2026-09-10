@@ -11,7 +11,7 @@ Move issues on the configured issue tracker through a small state machine of tri
 
 ## 0. Preconditions
 
-Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of `${CLAUDE_PLUGIN_ROOT}/skills/setup/SKILL.md`: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. `/groundwork:setup` is only for customizing.
+Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of the groundwork `setup` skill: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. Running `setup` explicitly is only for customizing.
 
 This skill assumes an external tracker with real issues, labels, comments, and reporters (`tracker: "github"` or `"linear"`). If `config.json`'s `tracker` is `"local"`, tell the user triage doesn't apply - `local` mode has no inbound-issue concept to sort, only `docs/groundwork/features/NNNN-slug/tasks.md` entries that `to-issues` already created with a type and status - and stop.
 
@@ -43,13 +43,13 @@ Five **state** roles:
 
 Every triaged issue should carry exactly one category role and one state role. If state roles conflict, flag it and ask the maintainer before doing anything else.
 
-These are canonical role names. Only the five **state** roles are configurable: their label strings come from `docs/groundwork/config.json`'s `triage_role_labels` field (not `triage_labels`, which is a separate, unrelated list `to-issues` applies to every issue it creates). If a state role is missing from `triage_role_labels` (or the field is empty), that role's label string equals its own name; tell the user to run `/groundwork:setup` to override any of them. The two **category** roles (`bug`, `enhancement`) are fixed - always use those exact strings, no config override exists for them.
+These are canonical role names. Only the five **state** roles are configurable: their label strings come from `docs/groundwork/config.json`'s `triage_role_labels` field (not `triage_labels`, which is a separate, unrelated list `to-issues` applies to every issue it creates). If a state role is missing from `triage_role_labels` (or the field is empty), that role's label string equals its own name; tell the user to run `setup` to override any of them. The two **category** roles (`bug`, `enhancement`) are fixed - always use those exact strings, no config override exists for them.
 
 State transitions: an unlabeled issue normally goes to `needs-triage` first; from there it moves to `needs-info`, `ready-for-agent`, `ready-for-human`, or `wontfix`. `needs-info` returns to `needs-triage` once the reporter replies. The maintainer can override at any time - flag transitions that look unusual and ask before proceeding.
 
 ## Invocation
 
-The maintainer invokes `/groundwork:triage` and describes what they want in natural language. Interpret the request and act. Examples:
+The maintainer invokes `triage` and describes what they want in natural language. Interpret the request and act. Examples:
 
 - "Show me anything that needs my attention"
 - "Let's look at #42"
@@ -77,7 +77,7 @@ Show counts and a one-line summary per issue. Let the maintainer pick.
 4. **Interview (if needed).** If the issue needs fleshing out, use the `groundwork:interview-loop` technique - ask detailed, one-at-a-time questions until every branch of the issue is resolved.
 
 5. **Apply the outcome:**
-   - `ready-for-agent` - post an agent brief comment ([AGENT-BRIEF.md](AGENT-BRIEF.md)). Give it `**Type:** AFK` in the brief so `/groundwork:build` can pick it up directly, exactly like a `to-issues`-created slice.
+   - `ready-for-agent` - post an agent brief comment ([AGENT-BRIEF.md](AGENT-BRIEF.md)). Give it `**Type:** AFK` in the brief so `build` can pick it up directly, exactly like a `to-issues`-created slice.
    - `ready-for-human` - same structure as an agent brief, but `**Type:** HITL`, and note why it can't be delegated (judgment calls, external access, design decisions, manual testing).
    - `needs-info` - post triage notes (template below).
    - `wontfix` (bug) - polite explanation, then close.
@@ -114,4 +114,4 @@ If prior triage notes exist on the issue, read them, check whether the reporter 
 
 ## Relationship to `to-issues`
 
-`to-issues` slices a `prd.md` into tracer-bullet work; `triage` sorts issues that already exist and, for `ready-for-agent`/`ready-for-human` outcomes, makes them directly buildable without a PRD at all. If an issue turns out to need real design work during the interview, tell the maintainer it's grown past a quick triage and suggest `/groundwork:survey` or `/groundwork:to-prd` instead of forcing an agent brief onto something underspecified.
+`to-issues` slices a `prd.md` into tracer-bullet work; `triage` sorts issues that already exist and, for `ready-for-agent`/`ready-for-human` outcomes, makes them directly buildable without a PRD at all. If an issue turns out to need real design work during the interview, tell the maintainer it's grown past a quick triage and suggest `survey` or `to-prd` instead of forcing an agent brief onto something underspecified.

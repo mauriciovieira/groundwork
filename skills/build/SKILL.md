@@ -7,11 +7,11 @@ argument-hint: "[feature-slug] [--worktree] [--parallel]"
 
 # groundwork:build
 
-Implement the slices `to-issues` created - or, for issues `/groundwork:triage` marked `ready-for-agent`/`ready-for-human` with no PRD behind them, implement straight from their Agent Brief. The default path is deliberately simple: one slice at a time, in this conversation, using TDD. Worktrees and parallel sub-agents are opt-in flags, not defaults - reach for them when the user asks, not automatically.
+Implement the slices `to-issues` created - or, for issues `triage` marked `ready-for-agent`/`ready-for-human` with no PRD behind them, implement straight from their Agent Brief. The default path is deliberately simple: one slice at a time, in this conversation, using TDD. Worktrees and parallel workers are opt-in flags, not defaults - reach for them when the user asks, not automatically.
 
 ## 0. Preconditions
 
-Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of `${CLAUDE_PLUGIN_ROOT}/skills/setup/SKILL.md`: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. `/groundwork:setup` is only for customizing.
+Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of the groundwork `setup` skill: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. Running `setup` explicitly is only for customizing.
 
 ## 1. Read the open, unblocked slices
 
@@ -21,22 +21,22 @@ Pull from the configured tracker:
 - `linear`: query via the Linear MCP tools for open issues in this feature whose blockers are resolved.
 - `local`: parse `docs/groundwork/features/NNNN-slug/tasks.md` for slices with `Status: open` whose `Blocked-by` slices are already `Status: done`.
 
-If this repo also uses `/groundwork:triage`, the tracker will contain raw inbound issues too - ones still sitting in `needs-triage`, `needs-info`, or otherwise not yet through the triage state machine, and possibly carrying an unrelated "Type:" field of their own (many issue templates have one, e.g. "Type: bug"). Skip anything whose `Type` field isn't exactly `AFK` or `HITL` (in whichever format applies, see below) - that's the actual signal a slice or Agent Brief exists, not just the presence of some field named `Type`. Don't attempt to build it.
+If this repo also uses `triage`, the tracker will contain raw inbound issues too - ones still sitting in `needs-triage`, `needs-info`, or otherwise not yet through the triage state machine, and possibly carrying an unrelated "Type:" field of their own (many issue templates have one, e.g. "Type: bug"). Skip anything whose `Type` field isn't exactly `AFK` or `HITL` (in whichever format applies, see below) - that's the actual signal a slice or Agent Brief exists, not just the presence of some field named `Type`. Don't attempt to build it.
 
 If nothing is unblocked, say so and stop - don't force a blocked slice through.
 
-An open issue is workable whether it came from `to-issues` (a `Type` field valued `AFK`/`HITL` somewhere in the issue body, pointing back to a `prd.md`) or from `/groundwork:triage` (a `**Type:** AFK`/`HITL` line inside its own Agent Brief comment, with no PRD at all) - the exact markdown shape and location of that `Type` field isn't guaranteed to match between the two, so look for a `Type` field whose value is `AFK` or `HITL` (not just those words appearing anywhere), wherever in the issue it's written, and treat the two sources identically once found.
+An open issue is workable whether it came from `to-issues` (a `Type` field valued `AFK`/`HITL` somewhere in the issue body, pointing back to a `prd.md`) or from `triage` (a `**Type:** AFK`/`HITL` line inside its own Agent Brief comment, with no PRD at all) - the exact markdown shape and location of that `Type` field isn't guaranteed to match between the two, so look for a `Type` field whose value is `AFK` or `HITL` (not just those words appearing anywhere), wherever in the issue it's written, and treat the two sources identically once found.
 
 ## 2. Default: sequential, one slice at a time
 
 For each unblocked slice, in order:
 
-1. Read the slice's acceptance criteria - from `prd.md` if it's a `to-issues` slice, or from its own Agent Brief comment if `/groundwork:triage` created it directly - and the relevant ADR sections.
+1. Read the slice's acceptance criteria - from `prd.md` if it's a `to-issues` slice, or from its own Agent Brief comment if `triage` created it directly - and the relevant ADR sections.
 2. Use the `groundwork:tdd` technique to implement it: a failing test per acceptance criterion first, minimal code to pass, then refactor.
 3. Mark the slice done in the tracker (close the issue, or set `Status: done` in `tasks.md`) once its tests pass.
 4. Move to the next unblocked slice.
 
-This runs entirely in the main agent, no worktree, no sub-agents, unless a flag below is given.
+This runs entirely in the main agent, no worktree, no workers, unless a flag below is given.
 
 ## 3. Opt-in: `--worktree`
 
@@ -44,13 +44,15 @@ Isolate each slice with the `groundwork:worktree` technique: one slice, one work
 
 ## 4. Opt-in: `--parallel`
 
-Dispatch every independent `AFK` slice (no unresolved blockers, not tagged `HITL`) to a separate `groundwork:slice-builder` agent, each isolated in its own worktree - this implies worktree isolation per dispatched slice even without also passing `--worktree`. Dispatch them concurrently. `HITL` slices, and any slice still blocked, stay sequential in the main agent regardless of `--parallel` - don't hand a slice that needs a human decision to an unattended sub-agent.
+Hand every independent `AFK` slice (no unresolved blockers, not tagged `HITL`) to its own `groundwork:slice-builder` worker, each isolated in its own worktree - this implies worktree isolation per slice even without also passing `--worktree`. Start them all before waiting on any. `HITL` slices, and any slice still blocked, stay sequential in the main agent regardless of `--parallel` - don't hand a slice that needs a human decision to an unattended worker.
 
-After the parallel dispatch returns, review each agent's summary before marking its slice done - a returned summary is not itself confirmation the slice is correct.
+If this runtime has no worker primitive, or cannot give each worker its own worktree, build sequentially instead and say so. Parallel writers sharing one directory corrupt each other, so this fallback is mandatory rather than a preference. See `skills/_runtime/RUNTIMES.md`.
+
+Once the workers return, review each summary before marking its slice done - a returned summary is not itself confirmation the slice is correct.
 
 ## 5. When reality forces a deviation
 
-If implementing a slice reveals that the PRD or an accepted ADR is wrong, incomplete, or contradicted by what you're finding, **stop and log it rather than silently diverging**. Tell the user exactly what conflicts and why, and wait for a decision (update the PRD/ADR via `/groundwork:survey`, or explicitly accept the deviation) before continuing that slice. Never quietly implement something different from what the PRD or an accepted ADR says.
+If implementing a slice reveals that the PRD or an accepted ADR is wrong, incomplete, or contradicted by what you're finding, **stop and log it rather than silently diverging**. Tell the user exactly what conflicts and why, and wait for a decision (update the PRD/ADR via `survey`, or explicitly accept the deviation) before continuing that slice. Never quietly implement something different from what the PRD or an accepted ADR says.
 
 ## 6. Hand off
 

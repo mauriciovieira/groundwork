@@ -1,0 +1,31 @@
+{
+  "name": "groundwork",
+  "version": "1.0.0",
+  "description": "Spec-driven development framework: Socratic discovery, PRDs, ADRs, tracer-bullet issues, TDD execution, and review.",
+  "author": {
+    "name": "Mauricio Vieira",
+    "email": "mauricio.vieira@gmail.com"
+  },
+  "homepage": "https://github.com/mauriciovieira/groundwork",
+  "repository": "https://github.com/mauriciovieira/groundwork",
+  "license": "MIT",
+  "keywords": [
+    "spec-driven-development",
+    "prd",
+    "adr",
+    "sdd",
+    "workflow",
+    "tdd"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Groundwork",
+    "shortDescription": "Spec-driven development, from a fuzzy idea to a reviewed diff.",
+    "longDescription": "Turns \"let's build X\" into a PRD, sharpened by a one-question-at-a-time interview, recorded as append-only ADRs, broken into tracer-bullet vertical slices, built with TDD, and reviewed against both the coding standards and the spec that motivated it - as much or as little of that as a task actually needs. Tracker-agnostic: GitHub, Linear, or a local checklist.",
+    "developerName": "Mauricio Vieira",
+    "category": "development",
+    "capabilities": [
+      "skills"
+    ]
+  }
+}

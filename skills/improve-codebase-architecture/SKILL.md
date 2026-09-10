@@ -12,7 +12,7 @@ This is a periodic, standalone check, not a required stop in the `brainstorm -> 
 
 ## 0. Preconditions
 
-Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of `${CLAUDE_PLUGIN_ROOT}/skills/setup/SKILL.md`: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. `/groundwork:setup` is only for customizing.
+Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of the groundwork `setup` skill: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. Running `setup` explicitly is only for customizing.
 
 ## Glossary
 
@@ -41,7 +41,7 @@ This skill is _informed_ by the project's domain model. `docs/groundwork/glossar
 
 Read `docs/groundwork/glossary.md` and any ADRs in the area you're touching first - check `docs/groundwork/adr/` for system-wide decisions not tied to one feature, and the relevant feature's `docs/groundwork/features/NNNN-slug/adr/` if the area maps to work already in flight.
 
-Then use the Agent tool with `subagent_type=Explore` to walk the codebase. Don't follow rigid heuristics - explore organically and note where you experience friction:
+Then walk the codebase - through a read-only exploration worker if this runtime has one, directly if not. Don't follow rigid heuristics - explore organically and note where you experience friction:
 
 - Where does understanding one concept require bouncing between many small modules?
 - Where are modules **shallow** - interface nearly as complex as the implementation?

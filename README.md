@@ -1,15 +1,21 @@
 # groundwork
 
-A lightweight, spec-driven development framework for Claude Code. It turns "let's build X" into a PRD (Product Requirements Document), sharpened by an interview, broken into small vertical slices, built with TDD (Test-Driven Development), and reviewed against both the code standards and the spec that motivated it - as much or as little of that as a task actually needs.
+A lightweight, spec-driven development framework for coding agents. It turns "let's build X" into a PRD (Product Requirements Document), sharpened by an interview, broken into small vertical slices, built with TDD (Test-Driven Development), and reviewed against both the code standards and the spec that motivated it - as much or as little of that as a task actually needs.
 
 Since 1.0, groundwork meets you halfway instead of waiting for commands. The advisory skills (`brainstorm`, `to-prd`, `quick`, `validate`, `code-review`) fire on their own when a request matches their trigger, orchestrators flow into each other instead of waiting for you to type the next command, and the first groundwork skill you touch bootstraps its own config with detected defaults. Every step with real side effects - creating tracker issues, building code, spawning parallel agents - still waits for an inline confirmation, and every skill remains directly invocable as a `/groundwork:...` command when you want to steer.
 
 ## Install
 
+**Claude Code:**
+
 ```
 /plugin marketplace add mauriciovieira/groundwork
 /plugin install groundwork
 ```
+
+**Codex:** this repository is a Codex plugin too - `.codex-plugin/plugin.json` points at the same `skills/` tree.
+
+**Anything else that reads `~/.agents/skills`** (opencode, Prime Agent, Gemini CLI): clone the repo and run `./install.sh`, which symlinks each skill into place. It never overwrites a skill you already have under that name, and `--dry-run` shows what it would do first. `./install.sh --uninstall` removes only the links pointing back at your clone.
 
 Optionally run `/groundwork:setup` to customize the per-repository defaults (tracker, docs location, labels, rules file). If you skip it, the first groundwork skill you use bootstraps a config with detected defaults and tells you what it assumed.
 
@@ -105,6 +111,12 @@ Not everything needs a PRD. `/groundwork:quick` does a trivial task directly - n
 ## Language
 
 groundwork itself - every `SKILL.md`, command, and this README - is written in English. The artifacts it generates (PRDs, ADRs, the glossary, issues) follow whatever language the conversation or your prompt is in. Nothing here hardcodes a language into generated output.
+
+## Running on something other than Claude Code
+
+The skills are plain prose and name no runtime's tools or environment variables, so any agent that can load a skill can execute them. Three things do depend on the host: loading a sibling skill during a hand-off, running independent workers in their own contexts, and giving a parallel writer its own worktree. [`skills/_runtime/RUNTIMES.md`](skills/_runtime/RUNTIMES.md) says what each is for and what to do when the runtime has no primitive for it. Every degraded path is slower but never wrong, with one exception: parallel writers without worktree isolation must fall back to sequential building, because writers sharing a directory corrupt each other.
+
+`skills/` is the entire install surface. `agents/` sits outside it deliberately - those files describe workers in Claude Code's own frontmatter, which has no portable meaning. Each one states in its body what the worker is for, what it may not do, and what it must return; that half is portable, and a runtime with a different worker format should translate it rather than copy the frontmatter.
 
 ## Notes on the Claude Code plugin format
 

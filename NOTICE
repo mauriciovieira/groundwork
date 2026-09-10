@@ -3,3 +3,17 @@ This project was inspired by these MIT-licensed projects:
 - https://github.com/mattpocock/skills
 - https://github.com/igoruehara/spec-driven
 - https://github.com/obra/superpowers
+- https://github.com/backnotprop/pstack (mirror of cursor/plugins/pstack)
+
+The direction of groundwork's verification work - that a spec-driven harness is
+only as good as the agent's ability to prove its own output, rather than assert
+it - comes from two articles by lauren (@poteto):
+
+- The Complete Guide to pstack Pt. 1
+  https://x.com/poteto/article/2094457600259842065
+- The Complete Guide to pstack Pt. 2
+  https://x.com/poteto/article/2097732320606507506
+
+groundwork adapts those ideas onto its own artifact model rather than vendoring
+any of that work. The multi-runtime install boundary follows the approach taken
+by https://github.com/michael-denyer/pstack-claude.

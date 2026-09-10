@@ -11,9 +11,9 @@ Survey a plan or design until it's sharp: a careful, one-question-at-a-time asse
 
 ## 0. Preconditions
 
-Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of `${CLAUDE_PLUGIN_ROOT}/skills/setup/SKILL.md`: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. `/groundwork:setup` is only for customizing.
+Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap it per the "Lazy bootstrap" section of the groundwork `setup` skill: detect tracker and project type, write the config with defaults, state the assumptions in one line, and continue. Running `setup` explicitly is only for customizing.
 
-Figure out which feature this is: an argument naming a slug, an obviously-current one from context, or if genuinely ambiguous, ask. If no feature exists yet for this idea, ask whether to create one (pick the next `NNNN-slug` under `docs/groundwork/features/`) or whether they meant to run `/groundwork:inception` or `/groundwork:to-prd` first.
+Figure out which feature this is: an argument naming a slug, an obviously-current one from context, or if genuinely ambiguous, ask. If no feature exists yet for this idea, ask whether to create one (pick the next `NNNN-slug` under `docs/groundwork/features/`) or whether they meant to run `inception` or `to-prd` first.
 
 ## 1. Establish what's being surveyed
 
@@ -138,7 +138,7 @@ Wire `Blocked-by` in a second pass, once every ticket has an id (a ticket needs 
 
 ### Fire research tickets
 
-For every `research` ticket just created, dispatch the `researcher` agent - concurrently, one per ticket.
+For every `research` ticket just created, run one `groundwork:researcher` worker per ticket, all started before waiting on any. If this runtime has no worker primitive, work them one at a time instead - see `skills/_runtime/RUNTIMES.md`.
 
 ### Work the frontier
 
@@ -155,7 +155,7 @@ Stop the session once the one non-research ticket claimed this pass is resolved 
 
 ## 6. Implementation-readiness check
 
-Before this feature can be declared ready for `/groundwork:to-issues`, confirm the implementation stack is actually settled - not just the product decisions above:
+Before this feature can be declared ready for `to-issues`, confirm the implementation stack is actually settled - not just the product decisions above:
 
 - Read `project_type` from `docs/groundwork/config.json`. If it's **missing entirely**, or it's `"existing"` with `detected_stack` missing or empty, backfill it in place: run the same implementation-status detection the Lazy bootstrap uses (setup's step 2 - record only what's actually found, never a guess), merge just those fields into the existing config, tell the user in one line, and continue.
 - If it's `"existing"` with a populated `detected_stack`, that answers this for anything the feature doesn't clearly push outside it. If the feature does need something the existing stack doesn't have (a new external service, a new datastore, etc.), interrogate that gap like any other decision and write the resulting ADR.
@@ -173,4 +173,4 @@ Either way, summarize what changed: which PRD sections were touched, which ADRs 
 
 ## 8. Hand off
 
-Once the plan is sharp and implementation-ready, offer to continue straight into `to-issues` to break it into work - on a yes, read and follow `${CLAUDE_PLUGIN_ROOT}/skills/to-issues/SKILL.md` in this session rather than waiting for the slash command. If the readiness check above is still unsatisfied, say so plainly and don't offer it.
+Once the plan is sharp and implementation-ready, offer to continue straight into `to-issues` to break it into work - on a yes, load and follow the groundwork `to-issues` skill in this session rather than waiting to be asked again. If the readiness check above is still unsatisfied, say so plainly and don't offer it.
