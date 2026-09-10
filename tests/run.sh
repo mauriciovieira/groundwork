@@ -215,8 +215,12 @@ done
 # An unimplemented subcommand must fail loudly. A branch that falls through and
 # exits 0 reports success for work nobody did - the exact failure this skill
 # exists to prevent, shipped inside its own template.
-for cmd in launch doctor drive prove; do
-  if awk "/^  $cmd\\)/,/^    ;;/" skills/verify/templates/control | grep -q 'die '; then
+# Match the "not implemented" die specifically, not any die: drive and prove
+# also carry an argument guard, and grepping for a bare `die` would accept a
+# branch whose terminal failure had been deleted.
+for cmd in launch doctor drive prove clean; do
+  if awk "/^  $cmd\\)/,/^    ;;/" skills/verify/templates/control \
+     | grep -q "$cmd is not implemented yet"; then
     pass "control's $cmd branch fails loudly until implemented"
   else
     fail "control's $cmd branch can exit 0 without doing anything"
