@@ -4,6 +4,7 @@ This project was inspired by these MIT-licensed projects:
 - https://github.com/igoruehara/spec-driven
 - https://github.com/obra/superpowers
 - https://github.com/backnotprop/pstack (mirror of cursor/plugins/pstack)
+- https://github.com/dkubb/skills
 
 The direction of groundwork's verification work - that a spec-driven harness is
 only as good as the agent's ability to prove its own output, rather than assert
@@ -14,6 +15,13 @@ it - comes from two articles by lauren (@poteto):
 - The Complete Guide to pstack Pt. 2
   https://x.com/poteto/article/2097732320606507506
 
-groundwork adapts those ideas onto its own artifact model rather than vendoring
-any of that work. The multi-runtime install boundary follows the approach taken
+The commit discipline inside a slice - verify the foundation before starting,
+keep each commit whole, reduce before adding, and correct with a fixup rather
+than an amend - is adapted from the atomic-changes skill by Dan Kubb (@dkubb):
+
+- https://github.com/dkubb/skills/blob/main/skills/atomic-changes/SKILL.md
+- https://x.com/dkubb/status/2097026178934800748
+
+groundwork adapts all of those ideas onto its own artifact model rather than
+vendoring any of that work. The multi-runtime install boundary follows the approach taken
 by https://github.com/michael-denyer/pstack-claude.

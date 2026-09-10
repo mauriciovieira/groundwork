@@ -21,3 +21,4 @@ For each acceptance criterion of the slice being built:
 - Never write implementation code with no failing test driving it. If you catch yourself doing that, stop, write the test, watch it fail, then continue.
 - Keep the loop scoped to the slice at hand. A test that exercises a different slice's behavior belongs in that slice's pass, not this one.
 - If an acceptance criterion turns out to be untestable as stated, that's a gap in the slice definition - flag it to the calling orchestrator rather than inventing a criterion that wasn't in the PRD.
+- Red-green-refactor is the loop inside one criterion; it says nothing about how the work reaches the history. `../_shared/ATOMIC-CHANGES.md` covers that - one kind of change per commit, reduce before you add, and corrections as `fixup!` rather than amends.

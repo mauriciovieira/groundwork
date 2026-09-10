@@ -15,6 +15,14 @@ Read `docs/groundwork/config.json`. If it doesn't exist, don't stop - bootstrap 
 
 Note whether the config has a `verify` block. If it does, every slice has to be proven before it closes (step 2 below). If it doesn't, say once that this repository has no verification set up, that slices will close on tests alone here, and that `validate` will refuse to pass the feature until `verify --init` has run. Then carry on. Never block a build over it - building unproven work is allowed, certifying it as done is not.
 
+## 0.5. Verify the foundation
+
+Before touching any code, run this repository's gates on the current state - the test suite, and `verify doctor` if a `verify` block is configured - and confirm they pass.
+
+If they don't, **stop and report it**. Do not start a slice on a red base. Building on one makes every failure ambiguous: you cannot tell your own breakage from what was already broken, and the debugging goes to the wrong change. Offer to fix the existing breakage first, as its own work, rather than folding it into a slice that did not cause it.
+
+If there is no runnable gate at all, say so once and continue - an absent suite is a known state, an unexamined one is not.
+
 ## 1. Read the open, unblocked slices
 
 Pull from the configured tracker:
@@ -60,6 +68,16 @@ If this runtime has no worker primitive, or cannot give each worker its own work
 Each worker runs its own verification and posts the evidence to its own PR before returning, and reports the outcome as part of its summary.
 
 Once the workers return, review each summary before marking its slice done - a returned summary is not itself confirmation the slice is correct, and a worker reporting success without evidence is exactly the case this check exists for. A slice whose worker could not prove it follows the same `needs-proof` path as the sequential case.
+
+## 4.5. Commit atomically inside a slice
+
+A slice is one vertical tracer bullet, but it rarely lands as one commit. Follow `../_shared/ATOMIC-CHANGES.md` for how its work reaches the history. The three rules that matter most:
+
+- **One kind of change per commit.** A commit that refactors and adds is doing two things, and a reviewer cannot tell which half broke something.
+- **Reduce before you add.** Within a slice, run remove, fix, move, rename and refactor before change and add, so the risky part lands on a base that has already been exercised.
+- **Corrections go in a `fixup!` commit**, aimed at the commit that introduced the defect, not an amend. Amending hides the change before anyone can review it. Folding is a separate deliberate step, and only on request.
+
+Each commit should leave the repository whole - passing the gates its change touches, standing alone without a follow-up to avoid a regression. That is the bound on how small a commit can be, not line count.
 
 ## 5. When reality forces a deviation
 

@@ -476,6 +476,34 @@ else
   fail "build lets unproven work through without saying validate will stop it"
 fi
 
+# A slice started on a red base makes every later failure ambiguous.
+if grep -q 'Verify the foundation' skills/build/SKILL.md; then
+  pass "build checks the gates before starting a slice"
+else
+  fail "build would start work without knowing the repo was green"
+fi
+
+# Amending hides a correction before anyone can review it.
+if grep -q 'fixup' skills/_shared/ATOMIC-CHANGES.md; then
+  pass "corrections stay auditable rather than amended away"
+else
+  fail "nothing stops a correction being amended into history unreviewed"
+fi
+
+for f in skills/build/SKILL.md skills/tdd/SKILL.md; do
+  if grep -q 'ATOMIC-CHANGES' "$f"; then
+    pass "$(basename $(dirname $f)) reaches the atomic-changes discipline"
+  else
+    fail "$(basename $(dirname $f)) cannot reach ATOMIC-CHANGES.md"
+  fi
+done
+
+if grep -q 'dkubb' NOTICE; then
+  pass "NOTICE credits the atomic-changes prior art"
+else
+  fail "NOTICE no longer credits where the commit discipline came from"
+fi
+
 # build promises the map is reconciled at the end of a pass; verify says so too.
 if grep -q 'verify --sync' skills/build/SKILL.md; then
   pass "build triggers the map reconciliation verify promises"
