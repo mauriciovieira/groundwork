@@ -42,7 +42,7 @@ The result: you can still drive everything with explicit commands, but a plain "
 | `/groundwork:build` | Implements the open, unblocked slices with TDD. Sequential by default; `--worktree` and `--parallel` are opt-in. |
 | `/groundwork:verify` | Proves a feature works by driving the running app and capturing evidence. Builds the project's verification CLI and feature map on first use (`--init`). |
 | `/groundwork:validate` | Definition-of-Done gate: every acceptance criterion tested, every slice done or deferred, no ADR (Architecture Decision Record) violated. |
-| `/groundwork:code-review` | Reviews the diff along a Standards axis and a Spec axis, in parallel, then merges both reports. |
+| `/groundwork:code-review` | Reviews the diff along a Standards axis and a Spec axis, in parallel, then merges both reports. A third worker arbitrates only where the two axes contradict each other. |
 | `/groundwork:quick` | The escape hatch: does a trivial task directly, no PRD/ADR/issues. |
 | `/groundwork:improve-codebase-architecture` | Periodic architecture review: finds deepening opportunities informed by `glossary.md` and `adr/`, interviews through the chosen candidate, updates both as decisions land. Not part of the linear flow - run it whenever, not per-feature. |
 
@@ -116,6 +116,31 @@ not left as a path into a gitignored scratch directory that vanishes with the wo
 
 Repositories with no `verify` block in their config simply skip this: `build` and `validate`
 say so once and carry on.
+
+## Nothing grades its own homework
+
+Two places in groundwork used to let the author of a thing also be its judge, and both now
+hand that step to a worker that did not do the work.
+
+**Competing designs.** When a decision has more than one genuinely defensible answer, `survey`
+follows [`skills/_shared/COMPETING-DESIGNS.md`](skills/_shared/COMPETING-DESIGNS.md): fix the
+criteria *before* seeing any candidate, produce several independently, then let
+`design-judge` rank them without knowing which worker wrote which. Criteria invented after
+the candidates exist are a rationalisation of whichever one you already liked. The winner
+becomes the ADR's Decision and the losers become its Context, so the same question is not
+re-argued in six months. This is opt-in by judgement, not a default - most decisions have one
+obvious shape, and a bake-off over an obvious question produces three variations of the same
+idea dressed up as alternatives.
+
+**Contradicting reviews.** `code-review`'s two axes are deliberately blind to each other, but
+nothing used to resolve it when they disagreed. Now `review-judge` settles the cases where one
+axis says the code must be a certain way and the other says that same thing is wrong - usually
+an accepted ADR mandating something the standards baseline reads as a smell. It runs only on
+real contradictions, never as a routine pass, and "both are right, a person has to change one
+of these documents" is an answer it is allowed to give.
+
+Both judges run on a stronger tier than the workers they judge, which is the one place in
+groundwork where that is worth paying for.
 
 ## Two speeds of survey
 

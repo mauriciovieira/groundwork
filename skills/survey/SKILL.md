@@ -24,7 +24,11 @@ Either an existing `prd.md` (read it first, then interrogate what's thin or unst
 Don't batch this to the end, whichever speed produced the decision. As soon as one resolves:
 
 - **Shapes the problem, users, goals, non-goals, or an acceptance criterion** -> update `docs/groundwork/features/NNNN-slug/prd.md` immediately.
-- **An architectural, technical, or process decision with a real tradeoff** (the kind someone will ask "why did we do it this way" about later) -> write a new ADR in Nygard format:
+- **An architectural, technical, or process decision with a real tradeoff** (the kind someone will ask "why did we do it this way" about later) -> write a new ADR in Nygard format.
+
+  When that decision has more than one genuinely defensible answer, do not settle it by picking the first shape that occurs to you. Follow `../_shared/COMPETING-DESIGNS.md`: fix the criteria before seeing any candidate, produce several independently, and have the `groundwork:design-judge` worker choose without knowing who wrote which. The winner becomes the Decision and the losers become the Context, which is what stops the same question being re-argued in six months. Most decisions do not need this - reach for it when you can name two answers you would defend, not by default.
+
+  The ADR format:
 
   ```markdown
   # MMMM. Title
@@ -138,7 +142,7 @@ Wire `Blocked-by` in a second pass, once every ticket has an id (a ticket needs 
 
 ### Fire research tickets
 
-For every `research` ticket just created, run one `groundwork:researcher` worker per ticket, all started before waiting on any. If this runtime has no worker primitive, work them one at a time instead - see `skills/_runtime/RUNTIMES.md`.
+For every `research` ticket just created, run one `groundwork:researcher` worker per ticket, all started before waiting on any. If this runtime has no worker primitive, work them one at a time instead - see `../_runtime/RUNTIMES.md`.
 
 ### Work the frontier
 

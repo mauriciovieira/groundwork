@@ -53,7 +53,7 @@ Isolate each slice with the `groundwork:worktree` technique: one slice, one work
 
 Hand every independent `AFK` slice (no unresolved blockers, not tagged `HITL`) to its own `groundwork:slice-builder` worker, each isolated in its own worktree - this implies worktree isolation per slice even without also passing `--worktree`. Start them all before waiting on any. `HITL` slices, and any slice still blocked, stay sequential in the main agent regardless of `--parallel` - don't hand a slice that needs a human decision to an unattended worker.
 
-If this runtime has no worker primitive, or cannot give each worker its own worktree, build sequentially instead and say so. Parallel writers sharing one directory corrupt each other, so this fallback is mandatory rather than a preference. See `skills/_runtime/RUNTIMES.md`.
+If this runtime has no worker primitive, or cannot give each worker its own worktree, build sequentially instead and say so. Parallel writers sharing one directory corrupt each other, so this fallback is mandatory rather than a preference. See `../_runtime/RUNTIMES.md`.
 
 Each worker runs its own verification and posts the evidence to its own PR before returning, and reports the outcome as part of its summary.
 

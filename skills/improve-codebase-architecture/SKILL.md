@@ -106,6 +106,6 @@ Side effects happen inline as decisions crystallize:
 
   If the candidate belongs to a feature already in flight, number it into that feature's `docs/groundwork/features/NNNN-slug/adr/`, scoped and sequenced the same way `survey` does. Otherwise - most deepening work isn't tied to a single feature - write it to `docs/groundwork/adr/MMMM-title.md` (create the directory lazily if it doesn't exist yet), numbered with the same four-digit sequence rule as feature-scoped ADRs but scoped to this directory - starting at `0001`, next available after that - and sequenced independently of any feature. Either way, ADRs are **append-only** once `Accepted`: a change of mind is a new ADR that supersedes the old one, never an edit to a decided one.
 
-- **Want to explore alternative interfaces for the deepened module?** See [INTERFACE-DESIGN.md](INTERFACE-DESIGN.md).
+- **Want to explore alternative interfaces for the deepened module?** See [INTERFACE-DESIGN.md](INTERFACE-DESIGN.md), which specialises the competing-designs pattern in `../_shared/COMPETING-DESIGNS.md` - several candidates produced independently, then ranked by a worker that did not write any of them.
 
 Write everything in the language the conversation has been in. No em dashes in any generated document.

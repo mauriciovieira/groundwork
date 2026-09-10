@@ -29,12 +29,19 @@ say() { [ "$DRY" -eq 1 ] && echo "would $*" || echo "$*"; }
 
 installed=0
 skipped=0
+shared=0
 
 for dir in "$SRC"/*/; do
   name=$(basename "$dir")
-  # _runtime holds the capability contract the skills point at, not a skill.
-  case "$name" in _*) continue ;; esac
   target="$DEST/$name"
+
+  # Underscore directories are not skills - they hold shared references the
+  # skills point at as ../_runtime/ and ../_shared/. They still have to be
+  # linked: an agent that resolves that path textually looks for a sibling of
+  # the installed skill, and finds nothing if only skills were linked. Counted
+  # apart so the summary does not call them skills.
+  is_shared=0
+  case "$name" in _*) is_shared=1 ;; esac
 
   if [ "$MODE" = uninstall ]; then
     if [ -L "$target" ] && [ "$(readlink "$target")" = "${dir%/}" ]; then
@@ -67,12 +74,17 @@ for dir in "$SRC"/*/; do
     mkdir -p "$DEST"
     ln -s "${dir%/}" "$target"
   fi
-  installed=$((installed + 1))
+  if [ "$is_shared" -eq 1 ]; then
+    shared=$((shared + 1))
+  else
+    installed=$((installed + 1))
+  fi
 done
 
 if [ "$MODE" = uninstall ]; then
   echo "removed $installed symlink(s) from $DEST"
 else
   echo "linked $installed skill(s) into $DEST, skipped $skipped"
+  [ "$shared" -gt 0 ] && echo "plus $shared shared reference director(ies) the skills point at"
   echo "_runtime/RUNTIMES.md documents what groundwork needs from a runtime."
 fi
