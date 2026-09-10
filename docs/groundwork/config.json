@@ -14,5 +14,9 @@
   },
   "github": {
     "repo": "mauriciovieira/groundwork"
+  },
+  "verify": {
+    "cli": "verify/control",
+    "evidence_dir": "verify/evidence"
   }
 }
