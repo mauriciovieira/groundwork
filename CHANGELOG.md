@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.1.0] - 2026-09-10
+
+### Added
+
+- prove a feature works instead of asserting it ([#16](https://github.com/mauriciovieira/groundwork/pull/16))
+- require proof before a slice or a feature counts as done ([#16](https://github.com/mauriciovieira/groundwork/pull/16))
+
+### Fixed
+
+- stop the language check from matching its own word list ([#16](https://github.com/mauriciovieira/groundwork/pull/16))
+
+### Changed
+
+- add structural tests and run them in CI ([#16](https://github.com/mauriciovieira/groundwork/pull/16))
+- match the not-implemented die, not any die ([#16](https://github.com/mauriciovieira/groundwork/pull/16))
+
 ## [2.0.0] - 2026-09-10
 
 ### Added
